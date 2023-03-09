@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    "IMI",
+    "RCR"
+  ],
+  "key": {
+    "M": { "item": "deepmoblearning:machine_casing", "data": 0 },
+    "S": { "item": "bloodmagic:slate", "data": 3 },
+    "R": { "item": "bloodmagic:blood_rune", "data": 3 },
+    "C": { "item": "minecraft:comparator", "data": 0 },
+    "I": { "item": "bloodmagic:inscription_tool", "data": 5 }
+  },
+  "result": {
+    "item": "deepmoblearningbm:digital_agonizer",
+    "count": 1
+  }
+}

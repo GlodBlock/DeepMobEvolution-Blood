@@ -1,0 +1,83 @@
+buildscript {
+    repositories {
+        maven {
+            url 'https://maven.minecraftforge.net/'
+        }
+        maven {
+            name 'sonatype'
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+        maven {
+            name 'Scala CI dependencies'
+            url 'https://repo1.maven.org/maven2/'
+        }
+        maven {
+            name 'jitpack'
+            url 'https://jitpack.io'
+        }
+        maven {
+            name "forge"
+            url "http://files.minecraftforge.net/maven"
+        }
+        mavenLocal()
+    }
+    dependencies {
+        classpath 'com.anatawa12.forge:ForgeGradle:2.3-1.0.7'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'idea'
+
+version = "1.0.0-e"
+group = "deepmoblearningbm"
+archivesBaseName = "Deep Mob Evolution - Blood Magic Addon"
+
+sourceCompatibility = targetCompatibility = '1.8'
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
+
+repositories {
+    maven { url 'https://dvs1.progwml6.com/files/maven/' }
+    maven { url 'https://jitpack.io/' }
+    maven { url 'https://cursemaven.com/' }
+    maven { url 'https://minecraft.curseforge.com/api/maven/' }
+}
+
+dependencies {
+    deobfCompile 'mezz.jei:jei_1.12.2:4.15.0.293' //jei
+    deobfCompile "curse.maven:patchouli-306770:3162874" //pcl
+    deobfCompile 'curse.maven:dme-737252:4278838' //dml
+    deobfCompile 'curse.maven:blood-magic-224791:2822288' //bm
+    deobfCompile 'curse.maven:guide-api-228832:2645992' //gpi
+}
+
+minecraft {
+    version = "1.12.2-14.23.5.2847"
+    runDir = "run"
+    mappings = "stable_39"
+    useDepAts = true
+    makeObfSourceJar = false
+}
+
+jar {
+    manifest {
+        attributes 'FMLCorePluginContainsFMLMod': 'false'
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+
+        expand 'version': project.version, 'mcversion': project.minecraft.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}

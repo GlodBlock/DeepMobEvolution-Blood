@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RYD",
+    "PPP"
+  ],
+  "key": {
+    "R": { "item": "minecraft:dye", "data": 1 },
+    "Y": { "item": "minecraft:ender_eye", "data": 0 },
+    "D": { "item": "bloodmagic:sigil_divination", "data": 0 },
+    "P": { "item": "deepmoblearning:soot_covered_plate", "data": 0 }
+  },
+  "result": {
+    "item": "deepmoblearningbm:altar_linker",
+    "count": 1
+  }
+}
