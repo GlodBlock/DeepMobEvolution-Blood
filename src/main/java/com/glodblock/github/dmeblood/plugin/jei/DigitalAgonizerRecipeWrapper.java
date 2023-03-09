@@ -4,7 +4,6 @@ import com.glodblock.github.dmeblood.util.EssenceHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeWrapper;
-import mustapelto.deepmoblearning.common.metadata.MetadataDataModelTier;
 import mustapelto.deepmoblearning.common.metadata.MetadataManager;
 import mustapelto.deepmoblearning.common.util.DataModelHelper;
 import net.minecraft.client.Minecraft;
@@ -21,15 +20,15 @@ public class DigitalAgonizerRecipeWrapper implements IRecipeWrapper {
     private int tier = 1;
     private long ticks = 0;
     private long lastWorldTime;
-    private final NonNullList<ItemStack> dataModels;
+    private final ItemStack dataModel;
 
     private final NonNullList<ItemStack> inputs = NonNullList.create();
     private final FluidStack output;
 
 
     public DigitalAgonizerRecipeWrapper(DigitalAgonizerRecipe recipe) {
-        this.dataModels = recipe.dataModels;
-        this.inputs.addAll(this.dataModels);
+        this.dataModel = recipe.dataModels;
+        this.inputs.add(this.dataModel);
         this.output = recipe.essence;
     }
 
@@ -42,31 +41,29 @@ public class DigitalAgonizerRecipeWrapper implements IRecipeWrapper {
     private void cycleTierAndModel() {
         this.tier = MetadataManager.isMaxDataModelTier(this.tier) ?
                 MetadataManager.getMinDataModelTier() : this.tier + 1;
+        DataModelHelper.setTierLevel(this.dataModel, this.tier);
     }
 
     @Override
     public void drawInfo(@Nonnull Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
         render(minecraft);
-        if (this.lastWorldTime == minecraft.world.getTotalWorldTime()) {
-            return;
-        } else {
+        if (this.lastWorldTime != minecraft.world.getTotalWorldTime()) {
             this.ticks ++;
             this.lastWorldTime = minecraft.world.getTotalWorldTime();
-        }
-        if(this.ticks % (20 * 2) == 0)  {
-            cycleTierAndModel();
+            if (this.ticks % 30 == 0)  {
+                cycleTierAndModel();
+            }
         }
     }
 
     public void render(Minecraft minecraft) {
         FontRenderer render = minecraft.fontRenderer;
 
-        String tierName = MetadataManager.getDataModelTierData(this.tier).map(MetadataDataModelTier::getDisplayName).orElse("Error");
+        String tierName = DataModelHelper.getTierDisplayNameFormatted(this.dataModel);
         render.drawStringWithShadow(tierName, 2, 27, 0xFFFFFF);
         NumberFormat f = NumberFormat.getNumberInstance(Locale.ENGLISH);
-        DataModelHelper.setTierLevel(this.dataModels.get(0), this.tier);
 
-        String amount = f.format(EssenceHelper.getFillAmount(this.dataModels.get(0), 1.0)) + " mB";
+        String amount = f.format(EssenceHelper.getFillAmount(this.dataModel, 1.0)) + " mB";
         render.drawStringWithShadow(amount, 114 - render.getStringWidth(amount), 27, 0xFFFFFF);
     }
 }

@@ -1,3 +1,5 @@
+![logo](https://github.com/GlodBlock/DeepMobEvolution-Blood/blob/master/logo.png)
+
 # Deep Mob Evolution - Blood Magic Addon
 
 It adds the digital agonizer for [Deep Mob Evolution](https://www.curseforge.com/minecraft/mc-mods/dme) and [Blood Magic](https://www.curseforge.com/minecraft/mc-mods/blood-magic).

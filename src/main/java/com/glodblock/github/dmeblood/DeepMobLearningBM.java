@@ -1,6 +1,8 @@
 package com.glodblock.github.dmeblood;
 
 import com.glodblock.github.dmeblood.common.Registry;
+import com.glodblock.github.dmeblood.common.data.DataSet;
+import com.glodblock.github.dmeblood.common.data.JSONLoader;
 import com.glodblock.github.dmeblood.proxy.CommonProxy;
 import com.glodblock.github.dmeblood.common.network.HighlightAltarMessage;
 import com.glodblock.github.dmeblood.common.tile.IContainerProvider;
@@ -26,6 +28,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 import javax.annotation.Nonnull;
+import java.io.File;
 
 @Mod(modid = ModConstants.MODID, version = ModConstants.VERSION, dependencies = "required-after:deepmoblearning;required-after:bloodmagic;after:jei;after:twilightforest")
 @Mod.EventBusSubscriber
@@ -46,6 +49,8 @@ public class DeepMobLearningBM {
     public void preInit(FMLPreInitializationEvent event) {
         network = NetworkRegistry.INSTANCE.newSimpleChannel(ModConstants.MODID);
         network.registerMessage(HighlightAltarMessage.Handler.class, HighlightAltarMessage.class, networkID++, Side.SERVER);
+        JSONLoader.setRoot(new File(event.getModConfigurationDirectory(), "dme_bloodmagic"));
+        DataSet.init();
     }
 
     @SubscribeEvent

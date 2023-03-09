@@ -52,7 +52,7 @@ public class Plugin implements IModPlugin {
             dataModels.add(new ItemStack(dataModel));
         }
         DigitalAgonizerRecipe.addRecipe(dataModels);
-        registry.addRecipes(new ArrayList<>(DigitalAgonizerRecipe.recipes), agonizerCategory.getUid());
+        registry.addRecipes(DigitalAgonizerRecipe.recipes, agonizerCategory.getUid());
         agonizerCategory.addCatalysts(registry);
     }
 }
