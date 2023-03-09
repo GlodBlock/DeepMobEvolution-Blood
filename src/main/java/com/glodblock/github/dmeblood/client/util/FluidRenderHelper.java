@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 
-
 public class FluidRenderHelper {
     private static final Minecraft mc = Minecraft.getMinecraft();
 

@@ -1,14 +1,14 @@
 [{
   "modid": "deepmoblearningbm",
   "name": "Deep Mob Evolution - Blood Magic Addon",
-  "description": "什么年代了还在用传统苦难井",
+  "description": "Digitization",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
   "authorList": ["GlodBlock"],
   "credits": "xt9 (IterationFunk)",
-  "logoFile": "",
+  "logoFile": "assets/deepmoblearningbm/logo.png",
   "screenshots": [],
   "dependencies": []
 }]
