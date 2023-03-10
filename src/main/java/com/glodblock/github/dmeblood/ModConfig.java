@@ -18,9 +18,6 @@ public class ModConfig {
         }
     }
 
-    @Config.Name("Essence Multiplier Settings")
-    public static CatalystMultiplierSubCategory essenceMultiplierSubCat = new CatalystMultiplierSubCategory();
-
     @Config.Comment({
         "Max: 10,000",
         "Default: 128"
@@ -37,48 +34,5 @@ public class ModConfig {
     })
     @Config.Name("Allow multiple agonizers linked with one Altar")
     public static boolean isMultipleAgonizersAllowed = false;
-
-    public static class CatalystMultiplierSubCategory {
-        @Config.Comment({"Default: 5.0"})
-        @Config.Name("#1 Multiplier of Corrupted Glitch Heart")
-        @Config.RangeDouble(min = 1.0, max = 10.0)
-        public double heartCatalystMultiplier = 5.0;
-        public double getHeartCatalystMultiplier() {
-            return MathHelper.clamp(heartCatalystMultiplier, 1.0, 10.0);
-        }
-
-        @Config.Comment({"Default: 2.2"})
-        @Config.Name("#2 Multiplier of Overworldian Living matter")
-        @Config.RangeDouble(min = 1.0, max = 10.0)
-        public double overworldianCatalystMultiplier = 2.2;
-        public double getOverworldianCatalystMultiplier() {
-            return MathHelper.clamp(overworldianCatalystMultiplier, 1.0, 10.0);
-        }
-
-        @Config.Comment({"Default: 2.4"})
-        @Config.Name("#3 Multiplier of Hellish Living matter")
-        @Config.RangeDouble(min = 1.0, max = 10.0)
-        public double hellishCatalystMultiplier = 2.4;
-        public double getHellishCatalystMultiplier() {
-            return MathHelper.clamp(hellishCatalystMultiplier, 1.0, 10.0);
-        }
-
-        @Config.Comment({"Default: 2.7"})
-        @Config.Name("#4 Multiplier of Extraterrestrial Living matter")
-        @Config.RangeDouble(min = 1.0, max = 10.0)
-        public double extraterrestrialCatalystMultiplier = 2.7;
-        public double getExtraterrestrialCatalystMultiplier() {
-            return MathHelper.clamp(extraterrestrialCatalystMultiplier, 1.0, 10.0);
-        }
-
-        @Config.Comment({"Default: 2.5"})
-        @Config.Name("#5 Multiplier of Twilight Living matter")
-        @Config.RangeDouble(min = 1.0, max = 10.0)
-        public double twilightCatalystMultiplier = 2.5;
-        public double getTwilightCatalystMultiplier() {
-            return MathHelper.clamp(twilightCatalystMultiplier, 1.0, 10.0);
-        }
-    }
-
 
 }

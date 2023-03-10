@@ -3,10 +3,9 @@ package com.glodblock.github.dmeblood;
 import com.glodblock.github.dmeblood.common.Registry;
 import com.glodblock.github.dmeblood.common.data.DataSet;
 import com.glodblock.github.dmeblood.common.data.JSONLoader;
-import com.glodblock.github.dmeblood.proxy.CommonProxy;
 import com.glodblock.github.dmeblood.common.network.HighlightAltarMessage;
 import com.glodblock.github.dmeblood.common.tile.IContainerProvider;
-import com.glodblock.github.dmeblood.util.Catalyst;
+import com.glodblock.github.dmeblood.proxy.CommonProxy;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -50,7 +49,6 @@ public class DeepMobLearningBM {
         network = NetworkRegistry.INSTANCE.newSimpleChannel(ModConstants.MODID);
         network.registerMessage(HighlightAltarMessage.Handler.class, HighlightAltarMessage.class, networkID++, Side.SERVER);
         JSONLoader.setRoot(new File(event.getModConfigurationDirectory(), "dme_bloodmagic"));
-        DataSet.init();
     }
 
     @SubscribeEvent
@@ -70,7 +68,7 @@ public class DeepMobLearningBM {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        Catalyst.init();
+        DataSet.init();
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new IGuiHandler() {
             public Object getServerGuiElement(int i, EntityPlayer player, World world, int x, int y, int z) {
                 TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));

@@ -1,4 +1,4 @@
-![logo](https://github.com/GlodBlock/DeepMobEvolution-Blood/blob/master/logo.png)
+![logo](https://github.com/GlodBlock/DeepMobEvolution-Blood/blob/master/logo.png#256x256)
 
 # Deep Mob Evolution - Blood Magic Addon
 
