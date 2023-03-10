@@ -17,9 +17,6 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 public class DigitalAgonizerRecipeWrapper implements IRecipeWrapper {
-    private int tier = 1;
-    private long ticks = 0;
-    private long lastWorldTime;
     private final ItemStack dataModel;
 
     private final NonNullList<ItemStack> inputs = NonNullList.create();
@@ -28,7 +25,7 @@ public class DigitalAgonizerRecipeWrapper implements IRecipeWrapper {
 
     public DigitalAgonizerRecipeWrapper(DigitalAgonizerRecipe recipe) {
         this.dataModel = recipe.dataModels;
-        this.inputs.add(this.dataModel);
+        this.inputs.add(recipe.dataModels);
         this.output = recipe.essence;
     }
 
@@ -38,32 +35,22 @@ public class DigitalAgonizerRecipeWrapper implements IRecipeWrapper {
         ingredients.setOutput(VanillaTypes.FLUID, this.output);
     }
 
-    private void cycleTierAndModel() {
-        this.tier = MetadataManager.isMaxDataModelTier(this.tier) ?
-                MetadataManager.getMinDataModelTier() : this.tier + 1;
-        DataModelHelper.setTierLevel(this.dataModel, this.tier);
-    }
-
     @Override
     public void drawInfo(@Nonnull Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
-        render(minecraft);
-        if (this.lastWorldTime != minecraft.world.getTotalWorldTime()) {
-            this.ticks ++;
-            this.lastWorldTime = minecraft.world.getTotalWorldTime();
-            if (this.ticks % 30 == 0)  {
-                cycleTierAndModel();
-            }
+        FontRenderer render = minecraft.fontRenderer;
+        for (int tier = MetadataManager.getMinDataModelTier(); tier < MetadataManager.getMaxDataModelTier(); tier ++) {
+            int offset = tier - MetadataManager.getMinDataModelTier();
+            drawTierInfo(27 + offset * 10, tier, render);
         }
     }
 
-    public void render(Minecraft minecraft) {
-        FontRenderer render = minecraft.fontRenderer;
-
+    private void drawTierInfo(int y, int tier, FontRenderer render) {
+        DataModelHelper.setTierLevel(this.dataModel, tier);
         String tierName = DataModelHelper.getTierDisplayNameFormatted(this.dataModel);
-        render.drawStringWithShadow(tierName, 2, 27, 0xFFFFFF);
+        render.drawStringWithShadow(tierName, 2, y, 0xFFFFFF);
         NumberFormat f = NumberFormat.getNumberInstance(Locale.ENGLISH);
-
         String amount = f.format(EssenceHelper.getFillAmount(this.dataModel, 1.0)) + " mB";
-        render.drawStringWithShadow(amount, 114 - render.getStringWidth(amount), 27, 0xFFFFFF);
+        render.drawStringWithShadow(amount, 114 - render.getStringWidth(amount), y, 0xFFFFFF);
     }
+
 }

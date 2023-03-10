@@ -14,7 +14,6 @@ import com.glodblock.github.dmeblood.util.EssenceHelper;
 import mustapelto.deepmoblearning.common.energy.DMLEnergyStorage;
 import mustapelto.deepmoblearning.common.inventory.ItemHandlerBase;
 import mustapelto.deepmoblearning.common.inventory.ItemHandlerDataModel;
-import mustapelto.deepmoblearning.common.util.DataModelHelper;
 import mustapelto.deepmoblearning.common.util.ItemStackHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -202,7 +201,7 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
     }
 
     public boolean isValidDataModelTier() {
-        return DataModelHelper.getTier(getDataModelStack()) != 0;
+        return EssenceHelper.getFluidBaseAmount(getDataModelStack()) > 0;
     }
 
     public boolean hasValidCatalyst() {

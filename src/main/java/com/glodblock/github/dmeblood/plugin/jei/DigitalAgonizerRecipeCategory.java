@@ -8,6 +8,7 @@ import mezz.jei.api.gui.*;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeCategory;
+import mustapelto.deepmoblearning.common.metadata.MetadataManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -23,8 +24,9 @@ public class DigitalAgonizerRecipeCategory implements IRecipeCategory<DigitalAgo
         ResourceLocation base = new ResourceLocation(ModConstants.MODID, "textures/gui/jei/digital_agonizer.png");
         this.catalyst = new ItemStack(Registry.blockDigitalAgonizerItem);
 
-        this.background = guiHelper.drawableBuilder(base, 0, 0, 116, 36).build();
-        IDrawableStatic progress = guiHelper.createDrawable(base, 0, 43, 35, 6);
+        int space = MetadataManager.getMaxDataModelTier() - MetadataManager.getMinDataModelTier();
+        this.background = guiHelper.drawableBuilder(base, 0, 0, 116, 26 + space * 10).build();
+        IDrawableStatic progress = guiHelper.createDrawable(base, 133, 0, 35, 6);
         this.progress = guiHelper.createAnimatedDrawable(progress, 120, IDrawableAnimated.StartDirection.LEFT, false);
     }
 
