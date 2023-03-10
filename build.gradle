@@ -31,7 +31,7 @@ apply plugin: 'idea'
 
 version = "1.0.0-e"
 group = "deepmoblearningbm"
-archivesBaseName = "Deep Mob Evolution - Blood Magic Addon"
+archivesBaseName = "DeepMobEvolution-BloodMagicAddon"
 
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava {

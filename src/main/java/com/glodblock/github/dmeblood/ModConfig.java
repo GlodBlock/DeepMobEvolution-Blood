@@ -30,9 +30,9 @@ public class ModConfig {
     }
 
     @Config.Comment({
-        "Default: false"
+        "Default: true"
     })
     @Config.Name("Allow multiple agonizers linked with one Altar")
-    public static boolean isMultipleAgonizersAllowed = false;
+    public static boolean isMultipleAgonizersAllowed = true;
 
 }
