@@ -1,14 +1,13 @@
 package com.glodblock.github.dmeblood.common.inventory;
 
+import com.glodblock.github.dmeblood.common.tile.TileEntityDigitalAgonizer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import com.glodblock.github.dmeblood.common.tile.TileEntityDigitalAgonizer;
 
 import javax.annotation.Nonnull;
 
@@ -25,7 +24,7 @@ public class ContainerDigitalAgonizer extends Container {
         this.player = inventory.player;
         this.world = world;
         this.tile = te;
-        this.inventory = this.tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        this.inventory = this.tile.getInnerInventory();
         this.tile.updateState(true);
         addSlotsToHandler();
         addInventorySlots();

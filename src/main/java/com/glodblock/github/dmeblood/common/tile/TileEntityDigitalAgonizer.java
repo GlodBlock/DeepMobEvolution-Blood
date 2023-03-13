@@ -31,6 +31,7 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 
 import javax.annotation.Nonnull;
@@ -204,10 +205,6 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
         return EssenceHelper.getFluidBaseAmount(getDataModelStack()) > 0;
     }
 
-    public boolean hasValidCatalyst() {
-        return Catalyst.isValidCatalyst(getCatalystStack());
-    }
-
     public int getFillAmount() {
         return EssenceHelper.getFillAmount(getDataModelStack(), (getMultiplier() + getSacrificeMultiplier()));
     }
@@ -304,12 +301,16 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(new CombinedInvWrapper(this.dataModel, this.input));
+            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.input);
         } if (capability == CapabilityEnergy.ENERGY) {
             return CapabilityEnergy.ENERGY.cast(energyCap);
         } else {
             return super.getCapability(capability, facing);
         }
+    }
+
+    public IItemHandler getInnerInventory() {
+        return new CombinedInvWrapper(this.dataModel, this.input);
     }
 
     @Override

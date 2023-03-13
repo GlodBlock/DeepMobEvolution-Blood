@@ -29,9 +29,9 @@ import net.minecraftforge.items.IItemHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-@SuppressWarnings("FieldCanBeLocal")
 public class BlockDigitalAgonizer extends Block implements ITileEntityProvider {
     private static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+    @SuppressWarnings("FieldCanBeLocal")
     private final String name = "digital_agonizer";
 
     public BlockDigitalAgonizer() {
@@ -93,7 +93,7 @@ public class BlockDigitalAgonizer extends Block implements ITileEntityProvider {
     public void breakBlock(World world, @Nonnull BlockPos pos, @Nonnull IBlockState state) {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileEntityDigitalAgonizer) {
-            IItemHandler inventory = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            IItemHandler inventory = ((TileEntityDigitalAgonizer) tile).getInnerInventory();
             if (inventory != null) {
                 for (int i = 0; i < inventory.getSlots(); i++) {
                     ItemStack stack = inventory.getStackInSlot(i);
@@ -110,10 +110,6 @@ public class BlockDigitalAgonizer extends Block implements ITileEntityProvider {
     @Override
     public void getSubBlocks(@Nonnull CreativeTabs tab, NonNullList<ItemStack> list) {
         list.add(new ItemStack(this));
-    }
-
-    public Class<TileEntityDigitalAgonizer> getTileEntityClass() {
-        return TileEntityDigitalAgonizer.class;
     }
 
     @Nullable
