@@ -19,6 +19,8 @@ text.altar_linker.error.1=Altar too far away from Agonizer!
 text.altar_linker.highlight=Displaying altar position for 20 seconds!
 
 gui.digital_agonizer.energy=Operational cost: %s RF/t
+gui.digital_agonizer.catalyst_operations=%s / %s
+gui.digital_agonizer.progress=Progress: %s / %s
 gui.digital_agonizer.run.0=Altar has %s sacrifice runes.
 gui.digital_agonizer.run.1=Rune multiplier: %sx
 gui.digital_agonizer.run.2=Catalyst multiplier: %sx

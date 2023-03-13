@@ -5,6 +5,7 @@ import WayofTime.bloodmagic.core.RegistrarBloodMagicBlocks;
 import com.glodblock.github.dmeblood.DeepMobLearningBM;
 import com.glodblock.github.dmeblood.ModConfig;
 import com.glodblock.github.dmeblood.ModConstants;
+import com.glodblock.github.dmeblood.client.gui.base.ToolTips;
 import com.glodblock.github.dmeblood.client.gui.buttons.AlertInformationZone;
 import com.glodblock.github.dmeblood.client.gui.buttons.ClickableZoneButton;
 import com.glodblock.github.dmeblood.client.gui.buttons.ZoneButton;
@@ -28,9 +29,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class DigitalAgonizerGui extends GuiContainer {
     private static final ResourceLocation defaultGui = new ResourceLocation(ModConstants.MODID, "textures/gui/default_gui.png");
@@ -44,6 +43,8 @@ public class DigitalAgonizerGui extends GuiContainer {
     private ClickableZoneButton altarButton;
     private AlertInformationZone alertButton;
     private static final NumberFormat F = NumberFormat.getNumberInstance(Locale.ENGLISH);
+    private ToolTips catalyst;
+    private ToolTips progress;
 
     public DigitalAgonizerGui(TileEntityDigitalAgonizer tile, InventoryPlayer inventory, World world) {
         super(new ContainerDigitalAgonizer(tile, inventory, world));
@@ -59,8 +60,12 @@ public class DigitalAgonizerGui extends GuiContainer {
         this.sacRuneZone = new ZoneButton(0, getGuiLeft() + 120, getGuiTop() - 8, 16, 16, this.width, this.height);
         this.altarButton = new ClickableZoneButton(1, getGuiLeft() + 130, getGuiTop() + 35, 16, 16, this.width, this.height);
         this.alertButton = new AlertInformationZone(2, getGuiLeft() + 114, getGuiTop() + 79, 16, 16, this.width, this.height);
+        this.catalyst = new ToolTips(this.fontRenderer,getGuiLeft() + 66,getGuiTop() + 31,16,2);
+        this.progress = new ToolTips(this.fontRenderer,getGuiLeft() + 88,getGuiTop() + 39,36,6);
         this.buttonList.add(this.sacRuneZone);
         this.buttonList.add(this.altarButton);
+        this.labelList.add(this.catalyst);
+        this.labelList.add(this.progress);
     }
 
     @Override
@@ -138,6 +143,10 @@ public class DigitalAgonizerGui extends GuiContainer {
         if(this.tile.getAltarTank() == null) {
             issueTooltips.add(I18n.format("gui.digital_agonizer.issue.3"));
         }
+
+        // tooltips
+        this.progress.setTooltip(Collections.singletonList(I18n.format("gui.digital_agonizer.progress", this.tile.getProgress(), 60)));
+        this.catalyst.setTooltip(Collections.singletonList(I18n.format("gui.digital_agonizer.catalyst_operations",this.tile.getCatalystOperations(),this.tile.getCatalystOperationsMax())));
 
         this.sacRuneZone.setTooltip(runeTooltips);
         this.altarButton.setTooltip(altarTooltips);
