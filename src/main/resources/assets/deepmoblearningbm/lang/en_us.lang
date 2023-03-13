@@ -3,6 +3,7 @@ itemGroup.deepmoblearningbm=DML - Blood Magic Addon
 item.deepmoblearningbm.altar_linker.name=Altar Linker
 
 tile.deepmoblearningbm.digital_agonizer.name=Digital Mob Agonizer
+tile.deepmoblearningbm.digital_will_injector.name=Digital Demon Will Injector
 
 tooltip.altar_linker.0=Max linking range: §r%s blocks
 tooltip.altar_linker.1=Agonizer target: §f(x: %s y: %s z: %s)§r
@@ -35,6 +36,14 @@ gui.digital_agonizer.issue.0=§cIssues§r
 gui.digital_agonizer.issue.1=- No Data Model
 gui.digital_agonizer.issue.2=- Data Model Tier too low
 gui.digital_agonizer.issue.3=- No linked Altar
+
+gui.digital_will_injector.energy=Running cost: %s RF/t
+gui.digital_will_injector.issue.0=§cIssues§r
+gui.digital_will_injector.issue.1=- No Data Model
+gui.digital_will_injector.issue.2=- Data Model not evil enough
+gui.digital_will_injector.issue.3=- Data Model Tier too low
+gui.digital_will_injector.issue.4=- No Sentient Weapon
+gui.digital_will_injector.issue.5=- Demon Will type not match
 
 jei.catalyst.info.0=Multiplier: §b%sx
 jei.catalyst.info.1=Operations: §b%s

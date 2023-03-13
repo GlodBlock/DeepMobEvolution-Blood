@@ -1,0 +1,11 @@
+{
+  "parent": "deepmoblearningbm:block/digital_agonizer",
+  "textures": {
+    "0": "deepmoblearningbm:blocks/color_stripes",
+    "1": "deepmoblearningbm:blocks/machine_base",
+    "2": "deepmoblearningbm:blocks/digital_will_injector_front_face",
+    "3": "deepmoblearningbm:blocks/machine_base_variant2",
+    "4": "deepmoblearningbm:blocks/machine_base_up",
+    "particle": "deepmoblearningbm:blocks/digital_will_injector_front_face"
+  }
+}
