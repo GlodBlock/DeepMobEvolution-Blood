@@ -118,7 +118,7 @@ public class DigitalAgonizerGui extends MachineGui<TileEntityDigitalAgonizer> {
         }
 
         // tooltips
-        this.progress.setTooltip(Collections.singletonList(I18n.format("gui.digital_agonizer.progress", this.tile.getProgress(), 60)));
+        this.progress.setTooltip(Collections.singletonList(I18n.format("gui.progress", this.tile.getProgress(), 60)));
         this.catalyst.setTooltip(Collections.singletonList(I18n.format("gui.digital_agonizer.catalyst_operations",this.tile.getCatalystOperations(),this.tile.getCatalystOperationsMax())));
 
         this.sacRuneZone.setTooltip(runeTooltips);
