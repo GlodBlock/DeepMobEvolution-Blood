@@ -7,12 +7,14 @@ import WayofTime.bloodmagic.soul.EnumDemonWillType;
 import WayofTime.bloodmagic.soul.IDemonWill;
 import WayofTime.bloodmagic.soul.IDemonWillGem;
 import mustapelto.deepmoblearning.common.inventory.ItemHandlerBase;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class SoulGemInputHandler extends ItemHandlerBase {
+    private final int slotIndex = 0;
 
     public SoulGemInputHandler() {
         super();
@@ -30,7 +32,7 @@ public class SoulGemInputHandler extends ItemHandlerBase {
 
     @Nullable
     public EnumDemonWillType getWillType() {
-        ItemStack stack = this.getStackInSlot(0);
+        ItemStack stack = this.getStackInSlot(slotIndex);
         if (stack.getItem() instanceof IMultiWillTool) {
             return ((IMultiWillTool) stack.getItem()).getCurrentType(stack);
         }
@@ -38,7 +40,7 @@ public class SoulGemInputHandler extends ItemHandlerBase {
     }
 
     public void fillGem(double willAmount, EnumDemonWillType type) {
-        ItemStack gemStack = this.getStackInSlot(0);
+        ItemStack gemStack = this.getStackInSlot(slotIndex);
         IDemonWillGem gem = (IDemonWillGem) gemStack.getItem();
         IDemonWill soul = (IDemonWill) RegistrarBloodMagicItems.MONSTER_SOUL;
         ItemStack soulStack = soul.createWill(type.ordinal(), willAmount);
@@ -47,7 +49,26 @@ public class SoulGemInputHandler extends ItemHandlerBase {
 
     public void genSoul(double willAmount, EnumDemonWillType type) {
         IDemonWill soul = (IDemonWill) RegistrarBloodMagicItems.MONSTER_SOUL;
-        this.setStackInSlot(0, soul.createWill(type.ordinal(), willAmount));
+        this.setStackInSlot(slotIndex, soul.createWill(type.ordinal(), willAmount));
+    }
+    public boolean canFill(double willAmount, EnumDemonWillType type){
+        ItemStack gemStack = this.getGemStack();
+        if(gemStack == null) return false;
+        Item gem = this.getGemStack().getItem();
+        if(gem instanceof ItemSoulGem){
+            return ((ItemSoulGem) gem).fillWill(type, gemStack, willAmount, false) > 0;
+        }
+        return false;
+    }
+    public ItemStack getGemStack(){
+        ItemStack stack =  this.getStackInSlot(slotIndex);
+        if(stack.getItem() instanceof IDemonWillGem){
+            return stack;
+        }
+        return null;
+    }
+    public boolean isEmpty(){
+        return this.getStackInSlot(slotIndex).isEmpty();
     }
 
 }

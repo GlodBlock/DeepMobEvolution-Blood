@@ -44,7 +44,7 @@ public class ToolTips extends GuiLabel {
         this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
         GuiScreen gui = mc.currentScreen;
         if (this.hovered && gui != null) {
-            GuiUtils.drawHoveringText(this.tooltip, mouseX, mouseY, gui.width, gui.height, -1, mc.fontRenderer);
+            GuiUtils.drawHoveringText(this.tooltip, mouseX, mouseY > 8 ? mouseY - 8 : 3, gui.width, gui.height, -1, mc.fontRenderer);
         }
     }
 }

@@ -86,10 +86,10 @@ public class TileEntityDigitalWillInjector extends TileEntity implements ITickab
 
     private void output() {
         if (this.weapon.getWillType() != null) {
-            if (this.weapon.getWillType() == this.gem.getWillType()) {
+            if (this.weapon.getWillType() == this.gem.getWillType() && this.gem.canFill(this.getFinalOutput(),this.gem.getWillType())) {
                 this.gem.fillGem(this.getFinalOutput(), this.weapon.getWillType());
                 SentientWeapon.damageWeapon(this.weapon.getStackInSlot(0), this.world.rand);
-            } else if (this.gem.getWillType() == null) {
+            } else if (this.gem.getWillType() == null && this.gem.isEmpty()) {
                 this.gem.genSoul(this.getFinalOutput(), this.weapon.getWillType());
                 SentientWeapon.damageWeapon(this.weapon.getStackInSlot(0), this.world.rand);
             }
@@ -104,7 +104,8 @@ public class TileEntityDigitalWillInjector extends TileEntity implements ITickab
 
     private boolean canContinueCraft() {
         return this.weapon.getWillType() != null &&
-                (this.weapon.getWillType() == this.gem.getWillType() || this.gem.getWillType() == null) &&
+                (this.weapon.getWillType() == this.gem.getWillType() && this.gem.canFill(this.getFinalOutput(),this.gem.getWillType()) ||
+                this.gem.getWillType() == null && this.gem.isEmpty()) &&
                 this.energyCap.getEnergyStored() > ModConfig.getWillInjectorRFCost() &&
                 this.getModelModifier() > 0 &&
                 this.getTierOutput() > 0;
