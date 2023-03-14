@@ -2,7 +2,7 @@
 
 [![Downloads](https://cf.way2muchnoise.eu/full_836009_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/deep-blood-evolution) ![MCVsrsion](https://cf.way2muchnoise.eu/versions/836009.svg)
 
-# Deep Mob Evolution - Blood Magic Addon
+# Deep Blood Evolution
 
 It adds the digital agonizer and demon will injector for [Deep Mob Evolution](https://www.curseforge.com/minecraft/mc-mods/dme) and [Blood Magic](https://www.curseforge.com/minecraft/mc-mods/blood-magic).
 
