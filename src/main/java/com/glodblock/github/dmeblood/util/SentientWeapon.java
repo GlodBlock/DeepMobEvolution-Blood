@@ -34,7 +34,7 @@ public final class SentientWeapon {
             d1 = nbt.getDouble("soulSwordDrop");
             d2 = nbt.getDouble("soulSwordStaticDrop");
         }
-        return loot * (d1 * rand.nextDouble() + d2) * multi;
+        return loot * (d1 * rand.nextDouble() + d2 == 0?1D:d2) * multi;
     }
 
 }

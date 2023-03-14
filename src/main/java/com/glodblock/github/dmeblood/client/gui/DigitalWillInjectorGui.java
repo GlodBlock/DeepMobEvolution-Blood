@@ -2,6 +2,7 @@ package com.glodblock.github.dmeblood.client.gui;
 
 import com.glodblock.github.dmeblood.ModConfig;
 import com.glodblock.github.dmeblood.ModConstants;
+import com.glodblock.github.dmeblood.client.gui.base.ToolTips;
 import com.glodblock.github.dmeblood.client.gui.buttons.AlertInformationZone;
 import com.glodblock.github.dmeblood.common.container.ContainerDigitalWillInjector;
 import com.glodblock.github.dmeblood.common.tile.TileEntityDigitalWillInjector;
@@ -15,12 +16,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DigitalWillInjectorGui extends MachineGui<TileEntityDigitalWillInjector> {
     private static final int WIDTH = 200;
     private static final int HEIGHT = 178;
     private AlertInformationZone alertButton;
+    private ToolTips progress;
 
     public DigitalWillInjectorGui(TileEntityDigitalWillInjector tile, InventoryPlayer inventory, World world) {
         super(tile, new ContainerDigitalWillInjector(tile, inventory, world));
@@ -33,6 +36,8 @@ public class DigitalWillInjectorGui extends MachineGui<TileEntityDigitalWillInje
     public void initGui() {
         super.initGui();
         this.alertButton = new AlertInformationZone(0, getGuiLeft() + 114, getGuiTop() + 79, 16, 16, this.width, this.height);
+        this.progress = new ToolTips(this.fontRenderer,this.guiLeft + 88,this.guiTop + 39,36,6);
+        this.labelList.add(progress);
     }
 
     @Override
@@ -76,6 +81,7 @@ public class DigitalWillInjectorGui extends MachineGui<TileEntityDigitalWillInje
             }
         }
         this.alertButton.setTooltip(issueTooltips);
+        this.progress.setTooltip(Collections.singletonList(I18n.format("gui.progress", this.tile.getProgress(), 60)));
     }
 
     @Override

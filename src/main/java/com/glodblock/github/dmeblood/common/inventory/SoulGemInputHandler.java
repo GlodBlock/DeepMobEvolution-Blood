@@ -1,11 +1,10 @@
 package com.glodblock.github.dmeblood.common.inventory;
 
 import WayofTime.bloodmagic.core.RegistrarBloodMagicItems;
-import WayofTime.bloodmagic.iface.IMultiWillTool;
+import WayofTime.bloodmagic.item.soul.ItemMonsterSoul;
 import WayofTime.bloodmagic.item.soul.ItemSoulGem;
 import WayofTime.bloodmagic.soul.EnumDemonWillType;
 import WayofTime.bloodmagic.soul.IDemonWill;
-import WayofTime.bloodmagic.soul.IDemonWillGem;
 import mustapelto.deepmoblearning.common.inventory.ItemHandlerBase;
 import net.minecraft.item.ItemStack;
 
@@ -13,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class SoulGemInputHandler extends ItemHandlerBase {
+    IDemonWill SOUL = (IDemonWill) RegistrarBloodMagicItems.MONSTER_SOUL;
 
     public SoulGemInputHandler() {
         super();
@@ -30,24 +30,34 @@ public class SoulGemInputHandler extends ItemHandlerBase {
 
     @Nullable
     public EnumDemonWillType getWillType() {
-        ItemStack stack = this.getStackInSlot(0);
-        if (stack.getItem() instanceof IMultiWillTool) {
-            return ((IMultiWillTool) stack.getItem()).getCurrentType(stack);
+        ItemStack stack = this.getGemStack();
+        if (stack.getItem() instanceof ItemMonsterSoul) {
+            return ((ItemMonsterSoul) stack.getItem()).getType(stack);
         }
         return null;
     }
 
     public void fillGem(double willAmount, EnumDemonWillType type) {
-        ItemStack gemStack = this.getStackInSlot(0);
-        IDemonWillGem gem = (IDemonWillGem) gemStack.getItem();
-        IDemonWill soul = (IDemonWill) RegistrarBloodMagicItems.MONSTER_SOUL;
-        ItemStack soulStack = soul.createWill(type.ordinal(), willAmount);
-        gem.fillDemonWillGem(gemStack, soulStack);
+        ItemStack gemStack = this.getGemStack();
+        IDemonWill gem = (IDemonWill) gemStack.getItem();
+        this.setGemStack(willAmount + gem.getWill(type,gemStack),type);
     }
 
     public void genSoul(double willAmount, EnumDemonWillType type) {
-        IDemonWill soul = (IDemonWill) RegistrarBloodMagicItems.MONSTER_SOUL;
-        this.setStackInSlot(0, soul.createWill(type.ordinal(), willAmount));
+        this.setGemStack(willAmount,type);
     }
 
+    public ItemStack getGemStack(){
+        return this.getStackInSlot(0);
+    }
+
+    public void setGemStack(double willAmount,EnumDemonWillType type){
+        if(this.getGemStack() == null){
+            this.setStackInSlot(0, SOUL.createWill(type.ordinal(), willAmount));
+        }else{
+            ItemStack gemStack = this.getGemStack();
+            IDemonWill gem = (IDemonWill) gemStack.getItem();
+            gem.setWill(type,gemStack,willAmount);
+        }
+    }
 }
