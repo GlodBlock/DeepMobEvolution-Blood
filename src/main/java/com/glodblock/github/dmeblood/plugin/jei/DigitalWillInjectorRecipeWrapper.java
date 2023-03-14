@@ -1,6 +1,7 @@
 package com.glodblock.github.dmeblood.plugin.jei;
 
-import com.glodblock.github.dmeblood.util.EssenceHelper;
+import WayofTime.bloodmagic.compat.jei.forge.TartaricForgeRecipeJEI;
+import com.glodblock.github.dmeblood.common.data.DataSet;
 import com.glodblock.github.dmeblood.util.ItemStackUtil;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
@@ -11,23 +12,23 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
-public class DigitalAgonizerRecipeWrapper implements IRecipeWrapper {
+public class DigitalWillInjectorRecipeWrapper implements IRecipeWrapper {
+
     private final ItemStack dataModel;
 
     private final NonNullList<ItemStack> inputs = NonNullList.create();
-    private final FluidStack output;
 
 
-    public DigitalAgonizerRecipeWrapper(DigitalAgonizerRecipe recipe) {
+    public DigitalWillInjectorRecipeWrapper(DigitalWillInjectorRecipe recipe) {
         this.dataModel = recipe.dataModels;
         this.inputs.addAll(ItemStackUtil.getAllModel(recipe.dataModels));
-        this.output = recipe.essence;
     }
 
     @Override
@@ -35,7 +36,9 @@ public class DigitalAgonizerRecipeWrapper implements IRecipeWrapper {
         List<List<ItemStack>> inputList = new LinkedList<>();
         inputList.add(this.inputs);
         ingredients.setInputLists(VanillaTypes.ITEM, inputList);
-        ingredients.setOutput(VanillaTypes.FLUID, this.output);
+        List<List<ItemStack>> outputList = new LinkedList<>();
+        outputList.add(this.getWills());
+        ingredients.setOutputLists(VanillaTypes.ITEM, outputList);
     }
 
     @Override
@@ -52,8 +55,19 @@ public class DigitalAgonizerRecipeWrapper implements IRecipeWrapper {
         String tierName = DataModelHelper.getTierDisplayNameFormatted(this.dataModel);
         render.drawStringWithShadow(tierName, 2, y, 0xFFFFFF);
         NumberFormat f = NumberFormat.getNumberInstance(Locale.ENGLISH);
-        String amount = f.format(EssenceHelper.getFillAmount(this.dataModel, 1.0)) + " mB";
+        String amount = "~" + f.format(
+                DataSet.willData.getTypeModifier(this.dataModel) *
+                        DataSet.willTierData.getWillOutput(tier)
+        ) + " Will";
         render.drawStringWithShadow(amount, 114 - render.getStringWidth(amount), y, 0xFFFFFF);
+    }
+
+    private List<ItemStack> getWills() {
+        LinkedList<ItemStack> list = new LinkedList<>();
+        for (TartaricForgeRecipeJEI.DefaultWill will : TartaricForgeRecipeJEI.DefaultWill.values()) {
+            list.add(will.willStack);
+        }
+        return list;
     }
 
 }
