@@ -1,19 +1,20 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "forge:ore_shaped",
   "pattern": [
     " S ",
-    "IMI",
+    "IMW",
     "RCR"
   ],
   "key": {
     "M": { "item": "deepmoblearning:machine_casing", "data": 0 },
     "S": { "item": "deepmoblearningbm:blood_infused_glitch_ingot", "data": 0 },
-    "R": { "item": "bloodmagic:blood_rune", "data": 3 },
+    "R": { "type": "forge:ore_dict", "ore": "dyeBlue" },
     "C": { "item": "minecraft:comparator", "data": 0 },
-    "I": { "item": "bloodmagic:inscription_tool", "data": 5 }
+    "I": { "item": "bloodmagic:soul_snare", "data": 0 },
+    "W": { "item": "bloodmagic:sentient_sword", "data": 0 }
   },
   "result": {
-    "item": "deepmoblearningbm:digital_agonizer",
+    "item": "deepmoblearningbm:digital_will_injector",
     "count": 1
   }
 }

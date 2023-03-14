@@ -1,6 +1,7 @@
 itemGroup.deepmoblearningbm=DML - Blood Magic Addon
 
 item.deepmoblearningbm.altar_linker.name=Altar Linker
+item.deepmoblearningbm.blood_infused_glitch_ingot.name=§cBlood Infused Glitch Ingot§r
 
 tile.deepmoblearningbm.digital_agonizer.name=Digital Mob Agonizer
 tile.deepmoblearningbm.digital_will_injector.name=Digital Demon Will Injector

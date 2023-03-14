@@ -4,6 +4,7 @@ import com.glodblock.github.dmeblood.common.Registry;
 import com.glodblock.github.dmeblood.common.data.DataSet;
 import com.glodblock.github.dmeblood.common.data.JSONLoader;
 import com.glodblock.github.dmeblood.common.network.HighlightAltarMessage;
+import com.glodblock.github.dmeblood.common.recipes.RecipeLoader;
 import com.glodblock.github.dmeblood.common.tile.IContainerProvider;
 import com.glodblock.github.dmeblood.proxy.CommonProxy;
 import net.minecraft.block.Block;
@@ -69,6 +70,7 @@ public class DeepMobLearningBM {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         DataSet.init();
+        RecipeLoader.run();
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new IGuiHandler() {
             public Object getServerGuiElement(int i, EntityPlayer player, World world, int x, int y, int z) {
                 TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));

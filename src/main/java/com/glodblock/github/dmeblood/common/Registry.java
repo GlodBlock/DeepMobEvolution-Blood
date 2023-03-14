@@ -3,6 +3,7 @@ package com.glodblock.github.dmeblood.common;
 import com.glodblock.github.dmeblood.DeepMobLearningBM;
 import com.glodblock.github.dmeblood.ModConstants;
 import com.glodblock.github.dmeblood.common.blocks.BlockDigitalWillInjector;
+import com.glodblock.github.dmeblood.common.items.ItemBloodIngot;
 import com.glodblock.github.dmeblood.common.tile.TileEntityDigitalAgonizer;
 import com.glodblock.github.dmeblood.common.tile.TileEntityDigitalWillInjector;
 import net.minecraft.block.Block;
@@ -25,6 +26,7 @@ public class Registry {
     public static Item blockDigitalAgonizerItem = new ItemBlock(blockDigitalAgonizer).setRegistryName(Objects.requireNonNull(blockDigitalAgonizer.getRegistryName()));
     public static Item blockDigitalWillInjectorItem = new ItemBlock(blockDigitalWillInjector).setRegistryName(Objects.requireNonNull(blockDigitalWillInjector.getRegistryName()));
     public static ItemAltarLinker itemAltarLinker = new ItemAltarLinker();
+    public static ItemBloodIngot itemBloodIngot = new ItemBloodIngot();
 
     private static final NonNullList<Block> blocks = NonNullList.create();
     private static final NonNullList<Item> itemBlocks = NonNullList.create();
@@ -44,6 +46,7 @@ public class Registry {
             itemBlocks.add(blockDigitalAgonizerItem);
             itemBlocks.add(blockDigitalWillInjectorItem);
             items.add(itemAltarLinker);
+            items.add(itemBloodIngot);
         }
         itemBlocks.forEach(registry::register);
         items.forEach(registry::register);
