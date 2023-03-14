@@ -98,6 +98,9 @@ public class DigitalWillInjectorGui extends MachineGui<TileEntityDigitalWillInje
         if (this.tile.getGemWillType() != null) {
             int craftingBarWidth = (int) (((float) this.tile.getProgress() / 60 * 36));
             drawTexturedModalRect(left + 88,  top + 39, 25, 59 + 6 * this.tile.getGemWillType().ordinal(), craftingBarWidth, 6);
+        } else if (this.tile.getWeaponWillType() != null) {
+            int craftingBarWidth = (int) (((float) this.tile.getProgress() / 60 * 36));
+            drawTexturedModalRect(left + 88,  top + 39, 25, 59 + 6 * this.tile.getWeaponWillType().ordinal(), craftingBarWidth, 6);
         }
 
         // Draw data model slot

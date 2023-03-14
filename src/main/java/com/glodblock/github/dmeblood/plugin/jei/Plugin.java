@@ -16,6 +16,7 @@ public class Plugin implements IModPlugin {
     private static IJeiHelpers jeiHelpers;
     private static DigitalAgonizerRecipeCategory agonizerCategory;
     private static DigitalAgonizerCatalystCategory agonizerCatalystCategory;
+    private static DigitalWillInjectorRecipeCategory willInjectorCategory;
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registry) {
@@ -27,6 +28,9 @@ public class Plugin implements IModPlugin {
 
         agonizerCatalystCategory = new DigitalAgonizerCatalystCategory(guiHelper);
         registry.addRecipeCategories(agonizerCatalystCategory);
+
+        willInjectorCategory = new DigitalWillInjectorRecipeCategory(guiHelper);
+        registry.addRecipeCategories(willInjectorCategory);
     }
 
     @Override
@@ -38,12 +42,25 @@ public class Plugin implements IModPlugin {
 
         registry.handleRecipes(Catalyst.class, DigitalAgonizerCatalystWrapper::new, agonizerCatalystCategory.getUid());
         addDigitalAgonizerCatalysts(registry);
+
+        registry.handleRecipes(DigitalWillInjectorRecipe.class, DigitalWillInjectorRecipeWrapper::new, willInjectorCategory.getUid());
+        addDigitalWillInjectorRecipes(registry);
     }
 
     private void addDigitalAgonizerCatalysts(IModRegistry registry) {
         List<Catalyst> e = new ArrayList<>(Catalyst.catalysts);
         registry.addRecipes(e, agonizerCatalystCategory.getUid());
         agonizerCatalystCategory.addCatalysts(registry);
+    }
+
+    private void addDigitalWillInjectorRecipes(IModRegistry registry) {
+        NonNullList<ItemStack> dataModels = NonNullList.create();
+        for (ItemDataModel dataModel : DMLRegistry.getDataModels()) {
+            dataModels.add(new ItemStack(dataModel));
+        }
+        DigitalWillInjectorRecipe.addRecipe(dataModels);
+        registry.addRecipes(DigitalWillInjectorRecipe.recipes, willInjectorCategory.getUid());
+        willInjectorCategory.addCatalysts(registry);
     }
 
     private void addDigitalAgonizerRecipes(IModRegistry registry) {

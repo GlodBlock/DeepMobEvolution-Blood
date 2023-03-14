@@ -26,10 +26,10 @@ public class WillTierData implements IJSONSerializable {
 
     @Override
     public void loadDefault() {
-        tierToWillOutput.put(1, 0.5);
-        tierToWillOutput.put(2, 1.0);
-        tierToWillOutput.put(3, 1.5);
-        tierToWillOutput.put(4, 2.0);
+        tierToWillOutput.put(1, 1.0);
+        tierToWillOutput.put(2, 1.5);
+        tierToWillOutput.put(3, 2.25);
+        tierToWillOutput.put(4, 3.37);
     }
 
     public double getWillOutput(int tier) {
