@@ -30,6 +30,17 @@ public class ModConfig {
     }
 
     @Config.Comment({
+            "Max: 10,000",
+            "Default: 256"
+    })
+    @Config.Name("RF tick cost of the Digital Will Injector")
+    @Config.RangeInt(min = 1, max = 10000)
+    public static int willInjectorRFCost = 256;
+    public static int getWillInjectorRFCost() {
+        return MathHelper.clamp(willInjectorRFCost, 1, 10000);
+    }
+
+    @Config.Comment({
         "Default: true"
     })
     @Config.Name("Allow multiple agonizers linked with one Altar")

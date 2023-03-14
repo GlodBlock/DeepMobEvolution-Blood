@@ -1,5 +1,6 @@
-package com.glodblock.github.dmeblood.common.inventory;
+package com.glodblock.github.dmeblood.common.inventory.slot;
 
+import com.glodblock.github.dmeblood.common.container.ContainerDigitalAgonizer;
 import com.glodblock.github.dmeblood.util.Catalyst;
 import mustapelto.deepmoblearning.common.items.ItemDataModel;
 import net.minecraft.item.Item;
@@ -8,6 +9,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 public class SlotDigitalAgonizer extends SlotItemHandler {
+
     public SlotDigitalAgonizer(IItemHandler handler, int index, int x, int y) {
         super(handler, index, x, y);
     }

@@ -1,6 +1,6 @@
 package com.glodblock.github.dmeblood.common.network;
 
-import com.glodblock.github.dmeblood.common.inventory.ContainerDigitalAgonizer;
+import com.glodblock.github.dmeblood.common.container.ContainerDigitalAgonizer;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentTranslation;

@@ -4,6 +4,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 
+import static com.glodblock.github.dmeblood.util.ItemStackUtil.isStackEqual;
+
 public class Catalyst {
     public static NonNullList<Catalyst> catalysts = NonNullList.create();
     private final ItemStack stack;
@@ -63,11 +65,4 @@ public class Catalyst {
         } return false;
     }
 
-    public static boolean isStackEqual(ItemStack stack1, ItemStack stack2, boolean checkNBT) {
-        boolean stackEqual = ItemStack.areItemsEqual(stack1, stack2);
-        if (checkNBT) {
-            return stackEqual & ItemStack.areItemStackTagsEqual(stack1, stack2);
-        }
-        return stackEqual;
-    }
 }

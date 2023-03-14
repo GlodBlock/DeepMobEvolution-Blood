@@ -8,7 +8,7 @@ import com.glodblock.github.dmeblood.DeepMobLearningBM;
 import com.glodblock.github.dmeblood.ModConfig;
 import com.glodblock.github.dmeblood.client.gui.DigitalAgonizerGui;
 import com.glodblock.github.dmeblood.common.inventory.CatalystInputHandler;
-import com.glodblock.github.dmeblood.common.inventory.ContainerDigitalAgonizer;
+import com.glodblock.github.dmeblood.common.container.ContainerDigitalAgonizer;
 import com.glodblock.github.dmeblood.util.Catalyst;
 import com.glodblock.github.dmeblood.util.EssenceHelper;
 import mustapelto.deepmoblearning.common.energy.DMLEnergyStorage;
@@ -31,6 +31,7 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 
 import javax.annotation.Nonnull;
@@ -38,7 +39,6 @@ import javax.annotation.Nullable;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, IContainerProvider {
-    public static final int GUI_ID = 1;
 
     private final ItemHandlerBase dataModel = new ItemHandlerDataModel();
     private final ItemHandlerBase input = new CatalystInputHandler();
@@ -152,7 +152,10 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
     }
 
     private boolean canContinueCraft() {
-        return this.energyCap.getEnergyStored() > ModConfig.getAgonizerRFCost() && !altarIsFull() && hasDataModel() && isValidDataModelTier();
+        return this.energyCap.getEnergyStored() > ModConfig.getAgonizerRFCost() &&
+                !altarIsFull() &&
+                hasDataModel() &&
+                isValidDataModelTier();
     }
 
     public BlockPos getAltarPos() {
@@ -204,10 +207,6 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
         return EssenceHelper.getFluidBaseAmount(getDataModelStack()) > 0;
     }
 
-    public boolean hasValidCatalyst() {
-        return Catalyst.isValidCatalyst(getCatalystStack());
-    }
-
     public int getFillAmount() {
         return EssenceHelper.getFillAmount(getDataModelStack(), (getMultiplier() + getSacrificeMultiplier()));
     }
@@ -229,12 +228,13 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
     }
 
     private void doStaggeredDiskSave(int divisor) {
-        if(this.saveTicks % divisor == 0) {
+        if (this.saveTicks % divisor == 0) {
             this.markDirty();
             this.saveTicks = 0;
         }
     }
 
+    @Override
     public void updateState(boolean markDirty) {
         IBlockState state = this.world.getBlockState(getPos());
         this.world.notifyBlockUpdate(getPos(), state, state, 3);
@@ -304,12 +304,22 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(new CombinedInvWrapper(this.dataModel, this.input));
+            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.input);
         } if (capability == CapabilityEnergy.ENERGY) {
             return CapabilityEnergy.ENERGY.cast(energyCap);
         } else {
             return super.getCapability(capability, facing);
         }
+    }
+
+    @Override
+    public int getID() {
+        return 0;
+    }
+
+    @Override
+    public IItemHandler getInnerInventory() {
+        return new CombinedInvWrapper(this.dataModel, this.input);
     }
 
     @Override
@@ -321,4 +331,6 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
     public DigitalAgonizerGui getGui(TileEntity entity, EntityPlayer player, World world, int x, int y, int z) {
         return new DigitalAgonizerGui((TileEntityDigitalAgonizer) world.getTileEntity(new BlockPos(x, y, z)), player.inventory, world);
     }
+
+
 }

@@ -1,51 +1,28 @@
-package com.glodblock.github.dmeblood.common.inventory;
+package com.glodblock.github.dmeblood.common.container;
 
+import com.glodblock.github.dmeblood.common.tile.IContainerProvider;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import com.glodblock.github.dmeblood.common.tile.TileEntityDigitalAgonizer;
+import net.minecraft.tileentity.TileEntity;
 
 import javax.annotation.Nonnull;
 
-public class ContainerDigitalAgonizer extends Container {
-    public static final int DATA_MODEL_SLOT = 0;
-    public static final int CATALYST_SLOT = 1;
+public abstract class DMEBMContainer<T extends TileEntity & IContainerProvider> extends Container {
 
-    private final IItemHandler inventory;
-    public TileEntityDigitalAgonizer tile;
+    public T tile;
     private final EntityPlayer player;
-    private final World world;
 
-    public ContainerDigitalAgonizer(TileEntityDigitalAgonizer te, InventoryPlayer inventory, World world) {
+    public DMEBMContainer(T te, InventoryPlayer inventory) {
         this.player = inventory.player;
-        this.world = world;
         this.tile = te;
-        this.inventory = this.tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        this.tile.updateState(true);
-        addSlotsToHandler();
-        addInventorySlots();
     }
 
-    @Override
-    public void detectAndSendChanges() {
-        super.detectAndSendChanges();
-        if (!this.world.isRemote) {
-            this.tile.updateState(false);
-            this.tile.updateSacrificeRuneCount();
-        }
-    }
+    abstract protected void addSlotsToHandler();
 
-    private void addSlotsToHandler() {
-        addSlotToContainer(new SlotDigitalAgonizer(this.inventory, DATA_MODEL_SLOT, 92, 79));
-        addSlotToContainer(new SlotDigitalAgonizer(this.inventory, CATALYST_SLOT, 66, 34));
-    }
-
-    private void addInventorySlots() {
+    protected void addInventorySlots() {
         // Bind actionbar
         for (int row = 0; row < 9; row++) {
             Slot slot = new Slot(this.player.inventory, row, 20 + row * 18, 172);
@@ -106,4 +83,5 @@ public class ContainerDigitalAgonizer extends Container {
     public boolean canInteractWith(EntityPlayer player) {
         return !player.isSpectator();
     }
+
 }

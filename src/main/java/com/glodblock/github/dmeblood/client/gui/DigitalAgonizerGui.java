@@ -9,36 +9,25 @@ import com.glodblock.github.dmeblood.client.gui.base.ToolTips;
 import com.glodblock.github.dmeblood.client.gui.buttons.AlertInformationZone;
 import com.glodblock.github.dmeblood.client.gui.buttons.ClickableZoneButton;
 import com.glodblock.github.dmeblood.client.gui.buttons.ZoneButton;
-import com.glodblock.github.dmeblood.common.inventory.ContainerDigitalAgonizer;
+import com.glodblock.github.dmeblood.common.container.ContainerDigitalAgonizer;
 import com.glodblock.github.dmeblood.common.network.HighlightAltarMessage;
 import com.glodblock.github.dmeblood.common.tile.TileEntityDigitalAgonizer;
-import mustapelto.deepmoblearning.common.energy.DMLEnergyStorage;
-import mustapelto.deepmoblearning.common.util.MathHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.energy.CapabilityEnergy;
-import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.*;
 
-public class DigitalAgonizerGui extends GuiContainer {
-    private static final ResourceLocation defaultGui = new ResourceLocation(ModConstants.MODID, "textures/gui/default_gui.png");
-    private static final ResourceLocation base = new ResourceLocation(ModConstants.MODID, "textures/gui/digital_agonizer_gui.png");
+public class DigitalAgonizerGui extends MachineGui<TileEntityDigitalAgonizer> {
 
-    private final TileEntityDigitalAgonizer tile;
     private static final int WIDTH =  200;
     private static final int HEIGHT = 178;
-    private final DMLEnergyStorage energyStorage;
     private ZoneButton sacRuneZone;
     private ClickableZoneButton altarButton;
     private AlertInformationZone alertButton;
@@ -46,12 +35,12 @@ public class DigitalAgonizerGui extends GuiContainer {
     private ToolTips catalyst;
     private ToolTips progress;
 
+
     public DigitalAgonizerGui(TileEntityDigitalAgonizer tile, InventoryPlayer inventory, World world) {
-        super(new ContainerDigitalAgonizer(tile, inventory, world));
-        this.tile = tile;
+        super(tile, new ContainerDigitalAgonizer(tile, inventory, world));
         this.xSize = WIDTH;
         this.ySize = HEIGHT;
-        this.energyStorage = (DMLEnergyStorage) tile.getCapability(CapabilityEnergy.ENERGY, null);
+        this.base = new ResourceLocation(ModConstants.MODID, "textures/gui/digital_agonizer_gui.png");
     }
 
     @Override
@@ -69,28 +58,12 @@ public class DigitalAgonizerGui extends GuiContainer {
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
-        this.buttonList.forEach(guiButton -> {
-            if(guiButton.isMouseOver()) {
-                handleButtonClick(guiButton);
-            }
-        });
-    }
-
-    private void handleButtonClick(GuiButton guiButton) {
-        if(guiButton.id == altarButton.id) {
-            if(tile.getAltarTank() != null) {
+    protected void handleButtonClick(GuiButton guiButton) {
+        if (guiButton == this.altarButton) {
+            if (tile.getAltarTank() != null) {
                 DeepMobLearningBM.network.sendToServer(new HighlightAltarMessage());
             }
         }
-    }
-
-    @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        drawDefaultBackground();
-        super.drawScreen(mouseX, mouseY, partialTicks);
-        renderHoveredToolTip(mouseX, mouseY);
     }
 
     @Override
@@ -134,13 +107,13 @@ public class DigitalAgonizerGui extends GuiContainer {
         }
 
         issueTooltips.add(I18n.format("gui.digital_agonizer.issue.0"));
-        if(!this.tile.hasDataModel()) {
+        if (!this.tile.hasDataModel()) {
             issueTooltips.add(I18n.format("gui.digital_agonizer.issue.1"));
         }
-        if(this.tile.hasDataModel() && !this.tile.isValidDataModelTier()) {
+        if (this.tile.hasDataModel() && !this.tile.isValidDataModelTier()) {
             issueTooltips.add(I18n.format("gui.digital_agonizer.issue.2"));
         }
-        if(this.tile.getAltarTank() == null) {
+        if (this.tile.getAltarTank() == null) {
             issueTooltips.add(I18n.format("gui.digital_agonizer.issue.3"));
         }
 
@@ -155,22 +128,14 @@ public class DigitalAgonizerGui extends GuiContainer {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         int left = getGuiLeft();
         int top = getGuiTop();
 
-        // Draw the main GUI
         Minecraft.getMinecraft().getTextureManager().bindTexture(base);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        drawTexturedModalRect(left + 46, top + 12, 0, 0, 107, 59);
-
         // Draw crafting progress
         int craftingBarWidth = (int) (((float) this.tile.getProgress() / 60 * 36));
         drawTexturedModalRect(left + 88,  top + 39, 25, 59, craftingBarWidth, 6);
-
-        // Draw current energy
-        int energyBarHeight = MathHelper.clamp((int) ((float) energyStorage.getEnergyStored() / (energyStorage.getMaxEnergyStored() - ModConfig.getAgonizerRFCost()) * 49), 0, 49);
-        int energyBarOffset = 49 - energyBarHeight;
-        drawTexturedModalRect(left + 52,  top + 17 + energyBarOffset, 0, 59, 7, energyBarHeight);
 
         // Draw data model slot
         drawTexturedModalRect(left + 91, top + 78, 7, 59, 18, 18);
@@ -192,10 +157,6 @@ public class DigitalAgonizerGui extends GuiContainer {
             drawCenteredString(this.fontRenderer,  this.tile.getFillAmount() + "mB", left + 105, top + 49, 0xFFFFFF);
         }
 
-        // Draw player inventory
-        Minecraft.getMinecraft().getTextureManager().bindTexture(defaultGui);
-        drawTexturedModalRect( left + 12, top + 106, 0, 0, 176, 90);
-
         // Draw catalyst operations
         drawGradientRect(left + 66, top + 31, left + 82, top + 33, 0xFF424242, 0xFF333333);
         int catalystWidth = (int) (((float) this.tile.getCatalystOperations() / tile.getCatalystOperationsMax() * 16));
@@ -207,20 +168,4 @@ public class DigitalAgonizerGui extends GuiContainer {
         }
     }
 
-    private void drawItemStack(int x, int y, ItemStack stack) {
-        RenderHelper.enableGUIStandardItemLighting();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
-        GL11.glPushMatrix();
-        GL11.glScalef(1.0F, 1.0F, 1.0F);
-        this.zLevel = 1.0F;
-        this.itemRender.zLevel = 1.0F;
-        this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
-        this.zLevel = 0.0F;
-        this.itemRender.zLevel = 0.0F;
-        GL11.glScalef(1.0F, 1.0F, 1.0F);
-        GL11.glPopMatrix();
-
-        RenderHelper.disableStandardItemLighting();
-    }
 }
