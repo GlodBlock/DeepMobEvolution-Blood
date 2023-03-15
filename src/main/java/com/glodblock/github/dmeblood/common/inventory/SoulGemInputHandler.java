@@ -51,23 +51,25 @@ public class SoulGemInputHandler extends ItemHandlerBase {
         IDemonWill soul = (IDemonWill) RegistrarBloodMagicItems.MONSTER_SOUL;
         this.setStackInSlot(slotIndex, soul.createWill(type.ordinal(), willAmount));
     }
-    public boolean canFill(double willAmount, EnumDemonWillType type){
+
+    public boolean canFill(double willAmount, EnumDemonWillType type) {
         ItemStack gemStack = this.getGemStack();
-        if (gemStack == ItemStack.EMPTY) return false;
+        if (gemStack.isEmpty()) return false;
         Item gem = gemStack.getItem();
         if (gem instanceof ItemSoulGem) {
             return ((ItemSoulGem) gem).fillWill(type, gemStack, willAmount, false) > 0;
         }
         return false;
     }
-    public ItemStack getGemStack(){
-        ItemStack stack =  this.getStackInSlot(slotIndex);
-        if(stack.getItem() instanceof IDemonWillGem){
+
+    public ItemStack getGemStack() {
+        ItemStack stack = this.getStackInSlot(slotIndex);
+        if (stack.getItem() instanceof IDemonWillGem){
             return stack;
         }
         return ItemStack.EMPTY;
     }
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return this.getStackInSlot(slotIndex).isEmpty();
     }
 
