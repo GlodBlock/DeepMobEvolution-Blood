@@ -53,9 +53,9 @@ public class SoulGemInputHandler extends ItemHandlerBase {
     }
     public boolean canFill(double willAmount, EnumDemonWillType type){
         ItemStack gemStack = this.getGemStack();
-        if(gemStack == null) return false;
-        Item gem = this.getGemStack().getItem();
-        if(gem instanceof ItemSoulGem){
+        if (gemStack == ItemStack.EMPTY) return false;
+        Item gem = gemStack.getItem();
+        if (gem instanceof ItemSoulGem) {
             return ((ItemSoulGem) gem).fillWill(type, gemStack, willAmount, false) > 0;
         }
         return false;
@@ -65,7 +65,7 @@ public class SoulGemInputHandler extends ItemHandlerBase {
         if(stack.getItem() instanceof IDemonWillGem){
             return stack;
         }
-        return null;
+        return ItemStack.EMPTY;
     }
     public boolean isEmpty(){
         return this.getStackInSlot(slotIndex).isEmpty();
