@@ -6,6 +6,7 @@ import com.glodblock.github.dmeblood.common.data.JSONLoader;
 import com.glodblock.github.dmeblood.common.network.HighlightAltarMessage;
 import com.glodblock.github.dmeblood.common.recipes.RecipeLoader;
 import com.glodblock.github.dmeblood.common.tile.IContainerProvider;
+import com.glodblock.github.dmeblood.integration.tconstruct.MaterialDef;
 import com.glodblock.github.dmeblood.proxy.CommonProxy;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -13,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -30,7 +32,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import javax.annotation.Nonnull;
 import java.io.File;
 
-@Mod(modid = ModConstants.MODID, version = ModConstants.VERSION, dependencies = "required-after:deepmoblearning;required-after:bloodmagic;after:jei;after:twilightforest")
+@Mod(
+        modid = ModConstants.MODID,
+        version = ModConstants.VERSION,
+        dependencies = "required-after:deepmoblearning;required-after:bloodmagic;after:jei;after:twilightforest;after:tconstruct"
+)
 @Mod.EventBusSubscriber
 public class DeepMobLearningBM {
     private int networkID = 0;
@@ -48,8 +54,11 @@ public class DeepMobLearningBM {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         network = NetworkRegistry.INSTANCE.newSimpleChannel(ModConstants.MODID);
-        network.registerMessage(HighlightAltarMessage.Handler.class, HighlightAltarMessage.class, networkID++, Side.SERVER);
+        network.registerMessage(HighlightAltarMessage.Handler.class, HighlightAltarMessage.class, networkID ++, Side.SERVER);
         JSONLoader.setRoot(new File(event.getModConfigurationDirectory(), "dme_bloodmagic"));
+        if (ModConstants.TINKER_CONSTRUCT) {
+            MaterialDef.init();
+        }
     }
 
     @SubscribeEvent
@@ -71,6 +80,9 @@ public class DeepMobLearningBM {
     public void init(FMLInitializationEvent event) {
         DataSet.init();
         RecipeLoader.run();
+        if (ModConstants.TINKER_CONSTRUCT) {
+            MaterialDef.initRecipe();
+        }
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new IGuiHandler() {
             public Object getServerGuiElement(int i, EntityPlayer player, World world, int x, int y, int z) {
                 TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
@@ -81,6 +93,10 @@ public class DeepMobLearningBM {
                 return tile instanceof IContainerProvider ? ((IContainerProvider) tile).getGui(tile, player, world, x, y, z) : null;
             }
         });
+    }
+
+    public static ResourceLocation resource(String name) {
+        return new ResourceLocation(ModConstants.MODID, name);
     }
 
     public static CreativeTabs creativeTab = new CreativeTabs(ModConstants.MODID) {

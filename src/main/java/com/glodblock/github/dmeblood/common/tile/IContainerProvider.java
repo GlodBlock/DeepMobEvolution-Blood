@@ -9,6 +9,10 @@ public interface IContainerProvider {
 
     int getID();
 
+    /**
+     * This inventory includes all item inventories in this tile.
+     * @return All inventories
+     */
     IItemHandler getInnerInventory();
 
     Object getContainer(TileEntity entity, EntityPlayer player, World world, int x, int y, int z);

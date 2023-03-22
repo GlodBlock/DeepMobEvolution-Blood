@@ -2,9 +2,15 @@ itemGroup.deepmoblearningbm=DML - Blood Magic Addon
 
 item.deepmoblearningbm.altar_linker.name=Altar Linker
 item.deepmoblearningbm.blood_infused_glitch_ingot.name=§cBlood Infused Glitch Ingot§r
+item.deepmoblearningbm.blood_infused_glitch_nugget.name=§cBlood Infused Glitch Nugget§r
 
 tile.deepmoblearningbm.digital_agonizer.name=Digital Mob Agonizer
 tile.deepmoblearningbm.digital_will_injector.name=Digital Demon Will Injector
+tile.deepmoblearningbm.block_blood_infused_glitch_ingot.name=§cBlock of Infused Glitch Ingot§r
+
+fluid.blood_infused_glitch.name=Molten Blood Infused Glitch
+
+material.blood_infused_glitch.name=Blood Infused Glitch
 
 tooltip.altar_linker.0=Max linking range: §r%s blocks
 tooltip.altar_linker.1=Agonizer target: §f(x: %s y: %s z: %s)§r

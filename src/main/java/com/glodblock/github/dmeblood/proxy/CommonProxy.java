@@ -23,5 +23,6 @@ public class CommonProxy {
     }
 
     public void registerItemRenderer(Item item, ResourceLocation location, int meta) {}
+
     public void spawnParticle(World world, double x, double y, double z, double mx, double my, double mz) {}
 }

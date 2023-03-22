@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "forge:ore_shaped",
   "pattern": [
     " S ",
     "IMI",
@@ -7,7 +7,7 @@
   ],
   "key": {
     "M": { "item": "deepmoblearning:machine_casing", "data": 0 },
-    "S": { "item": "deepmoblearningbm:blood_infused_glitch_ingot", "data": 0 },
+    "S": { "type": "forge:ore_dict", "ore": "ingotBloodInfusedGlitch" },
     "R": { "item": "bloodmagic:blood_rune", "data": 3 },
     "C": { "item": "minecraft:comparator", "data": 0 },
     "I": { "item": "bloodmagic:inscription_tool", "data": 5 }

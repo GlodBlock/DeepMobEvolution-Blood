@@ -1,0 +1,12 @@
+{
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
+      "type": "forge:ore_dict", "ore": "ingotBloodInfusedGlitch"
+    }
+  ],
+  "result": {
+    "item": "deepmoblearningbm:blood_infused_glitch_nugget",
+    "count": 9
+  }
+}

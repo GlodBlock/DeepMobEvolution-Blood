@@ -1,0 +1,15 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "NNN",
+    "NNN",
+    "NNN"
+  ],
+  "key": {
+    "N": { "type": "forge:ore_dict", "ore": "nuggetBloodInfusedGlitch" }
+  },
+  "result": {
+    "item": "deepmoblearningbm:blood_infused_glitch_ingot",
+    "count": 1
+  }
+}

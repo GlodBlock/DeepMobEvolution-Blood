@@ -1,0 +1,6 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "deepmoblearningbm:blocks/block_blood_infused_glitch_ingot"
+  }
+}

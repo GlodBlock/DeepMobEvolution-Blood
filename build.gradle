@@ -51,6 +51,8 @@ dependencies {
     deobfCompile 'curse.maven:dme-737252:4278838' //dml
     deobfCompile 'curse.maven:blood-magic-224791:2822288' //bm
     deobfCompile 'curse.maven:guide-api-228832:2645992' //gpi
+    deobfCompile 'curse.maven:tinkers-construct-74072:2902483' //tic
+    deobfCompile 'curse.maven:mantle-74924:2713386' //mtl
 }
 
 minecraft {
