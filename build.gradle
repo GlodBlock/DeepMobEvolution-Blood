@@ -66,6 +66,7 @@ minecraft {
 jar {
     manifest {
         attributes 'FMLCorePluginContainsFMLMod': 'false'
+        attributes 'FMLCorePlugin' : 'com.glodblock.github.dmeblood.coremod.DBECoreMod'
     }
 }
 

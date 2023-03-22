@@ -13,7 +13,7 @@ public class TraitOverflow extends AbstractTrait {
     @Override
     public void afterHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damageDealt, boolean wasCritical, boolean wasHit) {
         if (wasHit && target.isEntityAlive() && random.nextDouble() > 0.75) {
-            target.setHealth(target.getHealth());
+            target.setHealth((float) Math.ceil(target.getHealth() / 2));
         }
     }
 

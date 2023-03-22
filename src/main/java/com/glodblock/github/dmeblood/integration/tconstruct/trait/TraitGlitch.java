@@ -19,11 +19,10 @@ public class TraitGlitch extends AbstractTrait {
     @Override
     public void afterHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damageDealt, boolean wasCritical, boolean wasHit) {
         World world = target.getEntityWorld();
-        if (wasHit && !target.isEntityAlive() && !world.isRemote && random.nextDouble() > 0.9) {
+        if (!target.isEntityAlive() && !world.isRemote && random.nextDouble() > 0.8) {
             BlockPos pos = target.getPosition();
             int loot = EnchantmentHelper.getEnchantmentLevel(Enchantments.LOOTING, tool) + 1;
             EntityItem item = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(DMLRegistry.ITEM_GLITCH_HEART, loot));
-            item.setDefaultPickupDelay();
             world.spawnEntity(item);
         }
     }
