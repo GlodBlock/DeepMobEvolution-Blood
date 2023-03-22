@@ -56,3 +56,11 @@ gui.digital_will_injector.issue.5=- Demon Will type not match
 
 jei.catalyst.info.0=Multiplier: §b%sx
 jei.catalyst.info.1=Operations: §b%s
+
+modifier.bloodlust.name=Bloodlust
+modifier.glitch.name=Glitch
+modifier.overflow.name=Overflow
+
+modifier.bloodlust.desc=§oI want more blood.§r\nAdds life essence to your soul network when killing.
+modifier.glitch.desc=§oCatch an exception!§r\nDrops Glitch Heart sometimes when killing.
+modifier.overflow.desc=§o-2147483648§r\nThere is a 25% probability that this weapon directly wipes off half of target's health each attack.

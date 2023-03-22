@@ -10,6 +10,4 @@ public class TraitDef {
     public static final TraitGlitch TRAIT_GLITCH = new TraitGlitch();
     public static final TraitOverflow TRAIT_OVERFLOW = new TraitOverflow();
 
-
-
 }
