@@ -1,17 +1,20 @@
 package com.glodblock.github.dmeblood.common.tile;
 
 import WayofTime.bloodmagic.soul.EnumDemonWillType;
+import com.glodblock.github.dmeblood.DeepMobLearningBM;
 import com.glodblock.github.dmeblood.ModConfig;
 import com.glodblock.github.dmeblood.client.gui.DigitalWillInjectorGui;
 import com.glodblock.github.dmeblood.common.container.ContainerDigitalWillInjector;
 import com.glodblock.github.dmeblood.common.data.DataSet;
 import com.glodblock.github.dmeblood.common.inventory.SentientInputHandler;
 import com.glodblock.github.dmeblood.common.inventory.SoulGemInputHandler;
+import com.glodblock.github.dmeblood.network.packets.SPacketStateUpdate;
 import com.glodblock.github.dmeblood.util.EssenceHelper;
 import com.glodblock.github.dmeblood.util.SentientWeapon;
 import mustapelto.deepmoblearning.common.energy.DMLEnergyStorage;
 import mustapelto.deepmoblearning.common.inventory.ItemHandlerBase;
 import mustapelto.deepmoblearning.common.inventory.ItemHandlerDataModel;
+import mustapelto.deepmoblearning.common.tiles.CraftingState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -26,6 +29,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
@@ -45,6 +49,7 @@ public class TileEntityDigitalWillInjector extends TileEntity implements ITickab
     };
     private int saveTicks = 0;
     private int progress = 0;
+    private CraftingState state = CraftingState.IDLE;
 
     @Override
     public int getID() {
@@ -54,6 +59,18 @@ public class TileEntityDigitalWillInjector extends TileEntity implements ITickab
     @Override
     public IItemHandler getInnerInventory() {
         return new CombinedInvWrapper(this.dataModel, this.weapon, this.gem);
+    }
+
+    @Override
+    public CraftingState getState() {
+        return this.state;
+    }
+
+    @Override
+    public void setState(CraftingState state) {
+        this.state = state;
+        IBlockState block = this.world.getBlockState(this.getPos());
+        this.world.notifyBlockUpdate(this.getPos(), block, block, 3);
     }
 
     @Override
@@ -80,13 +97,34 @@ public class TileEntityDigitalWillInjector extends TileEntity implements ITickab
             } else {
                 this.progress = 0;
             }
+            updateCraftState();
             doStaggeredDiskSave(100);
         }
     }
 
+    public void updateCraftState() {
+        if (this.state != this.getCurrentState()) {
+            this.state = this.getCurrentState();
+            DeepMobLearningBM.proxy.netHandler.sendToAllTracking(
+                    new SPacketStateUpdate(this, this.state),
+                    new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 10.0)
+            );
+        }
+    }
+
+    protected CraftingState getCurrentState() {
+        if (canContinueCraft()) {
+            return CraftingState.RUNNING;
+        }
+        if (getDataModelStack().isEmpty()) {
+            return CraftingState.IDLE;
+        }
+        return CraftingState.ERROR;
+    }
+
     private void output() {
         if (this.weapon.getWillType() != null) {
-            if (this.weapon.getWillType() == this.gem.getWillType() && this.gem.canFill(this.getFinalOutput(),this.gem.getWillType())) {
+            if (this.weapon.getWillType() == this.gem.getWillType() && this.gem.canFill(this.getFinalOutput(), this.gem.getWillType())) {
                 this.gem.fillGem(this.getFinalOutput(), this.weapon.getWillType());
                 SentientWeapon.damageWeapon(this.weapon.getStackInSlot(0), this.world.rand);
             } else if (this.gem.getWillType() == null && this.gem.isEmpty()) {
@@ -141,7 +179,7 @@ public class TileEntityDigitalWillInjector extends TileEntity implements ITickab
 
     @Override
     public SPacketUpdateTileEntity getUpdatePacket() {
-        return new SPacketUpdateTileEntity(getPos(), 3, writeToNBT(new NBTTagCompound()));
+        return new SPacketUpdateTileEntity(getPos(), 3, this.writeToNBT(new NBTTagCompound()));
     }
 
     @Nonnull

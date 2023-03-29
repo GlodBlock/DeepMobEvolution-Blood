@@ -1,8 +1,8 @@
 package com.glodblock.github.dmeblood.client.gui;
 
 import com.glodblock.github.dmeblood.ModConfig;
-import com.glodblock.github.dmeblood.ModConstants;
 import com.glodblock.github.dmeblood.common.tile.IContainerProvider;
+import mustapelto.deepmoblearning.DMLConstants;
 import mustapelto.deepmoblearning.common.energy.DMLEnergyStorage;
 import mustapelto.deepmoblearning.common.util.MathHelper;
 import net.minecraft.client.Minecraft;
@@ -24,7 +24,7 @@ import java.util.Locale;
 public abstract class MachineGui<T extends TileEntity & IContainerProvider> extends GuiContainer {
 
     protected static final NumberFormat F = NumberFormat.getNumberInstance(Locale.ENGLISH);
-    protected static final ResourceLocation defaultGui = new ResourceLocation(ModConstants.MODID, "textures/gui/default_gui.png");
+    protected static final ResourceLocation defaultGui = new ResourceLocation(DMLConstants.ModInfo.ID, "textures/gui/player_inventory.png");
     protected ResourceLocation base;
     protected final T tile;
     protected final DMLEnergyStorage energyStorage;
@@ -71,7 +71,7 @@ public abstract class MachineGui<T extends TileEntity & IContainerProvider> exte
 
         // Draw player inventory
         Minecraft.getMinecraft().getTextureManager().bindTexture(defaultGui);
-        drawTexturedModalRect( left + 12, top + 106, 0, 0, 176, 90);
+        drawTexturedModalRect( left + 11, top + 105, 0, 0, 177, 91);
     }
 
     protected void drawItemStack(int x, int y, ItemStack stack) {

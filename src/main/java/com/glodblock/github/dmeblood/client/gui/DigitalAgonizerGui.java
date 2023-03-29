@@ -10,7 +10,7 @@ import com.glodblock.github.dmeblood.client.gui.buttons.AlertInformationZone;
 import com.glodblock.github.dmeblood.client.gui.buttons.ClickableZoneButton;
 import com.glodblock.github.dmeblood.client.gui.buttons.ZoneButton;
 import com.glodblock.github.dmeblood.common.container.ContainerDigitalAgonizer;
-import com.glodblock.github.dmeblood.common.network.HighlightAltarMessage;
+import com.glodblock.github.dmeblood.network.packets.CHighlightAltarMessage;
 import com.glodblock.github.dmeblood.common.tile.TileEntityDigitalAgonizer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -20,7 +20,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -61,7 +60,7 @@ public class DigitalAgonizerGui extends MachineGui<TileEntityDigitalAgonizer> {
     protected void handleButtonClick(GuiButton guiButton) {
         if (guiButton == this.altarButton) {
             if (tile.getAltarTank() != null) {
-                DeepMobLearningBM.network.sendToServer(new HighlightAltarMessage());
+                DeepMobLearningBM.proxy.netHandler.sendToServer(new CHighlightAltarMessage());
             }
         }
     }

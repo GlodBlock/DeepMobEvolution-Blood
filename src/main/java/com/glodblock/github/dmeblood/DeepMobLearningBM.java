@@ -3,10 +3,10 @@ package com.glodblock.github.dmeblood;
 import com.glodblock.github.dmeblood.common.Registry;
 import com.glodblock.github.dmeblood.common.data.DataSet;
 import com.glodblock.github.dmeblood.common.data.JSONLoader;
-import com.glodblock.github.dmeblood.common.network.HighlightAltarMessage;
 import com.glodblock.github.dmeblood.common.recipes.RecipeLoader;
 import com.glodblock.github.dmeblood.common.tile.IContainerProvider;
 import com.glodblock.github.dmeblood.integration.tconstruct.MaterialDef;
+import com.glodblock.github.dmeblood.network.PacketLoader;
 import com.glodblock.github.dmeblood.proxy.CommonProxy;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -26,8 +26,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -49,13 +47,11 @@ public class DeepMobLearningBM {
         serverSide="com.glodblock.github.dmeblood.proxy.CommonProxy"
     )
     public static CommonProxy proxy;
-    public static SimpleNetworkWrapper network;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        network = NetworkRegistry.INSTANCE.newSimpleChannel(ModConstants.MODID);
-        network.registerMessage(HighlightAltarMessage.Handler.class, HighlightAltarMessage.class, networkID ++, Side.SERVER);
         JSONLoader.setRoot(new File(event.getModConfigurationDirectory(), "dme_bloodmagic"));
+        PacketLoader.init();
         if (ModConstants.TINKER_CONSTRUCT) {
             MaterialDef.init();
         }

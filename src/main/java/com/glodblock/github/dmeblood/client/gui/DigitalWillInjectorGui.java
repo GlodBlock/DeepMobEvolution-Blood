@@ -112,7 +112,7 @@ public class DigitalWillInjectorGui extends MachineGui<TileEntityDigitalWillInje
 
         // Draw player inventory
         Minecraft.getMinecraft().getTextureManager().bindTexture(defaultGui);
-        drawTexturedModalRect( left + 12, top + 106, 0, 0, 176, 90);
+        drawTexturedModalRect( left + 11, top + 105, 0, 0, 177, 91);
 
         this.buttonList.forEach(guiButton -> guiButton.drawButton(this.mc, mouseX, mouseY, this.mc.getRenderPartialTicks()));
         if(this.tile.getTierOutput() <= 0 || this.tile.getModelModifier() <= 0 || this.tile.getWeaponWillType() == null || (this.tile.getGemWillType() != null && this.tile.getGemWillType() != this.tile.getWeaponWillType())) {

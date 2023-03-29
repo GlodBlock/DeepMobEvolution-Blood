@@ -7,13 +7,15 @@ import WayofTime.bloodmagic.tile.TileAltar;
 import com.glodblock.github.dmeblood.DeepMobLearningBM;
 import com.glodblock.github.dmeblood.ModConfig;
 import com.glodblock.github.dmeblood.client.gui.DigitalAgonizerGui;
-import com.glodblock.github.dmeblood.common.inventory.CatalystInputHandler;
 import com.glodblock.github.dmeblood.common.container.ContainerDigitalAgonizer;
+import com.glodblock.github.dmeblood.common.inventory.CatalystInputHandler;
+import com.glodblock.github.dmeblood.network.packets.SPacketStateUpdate;
 import com.glodblock.github.dmeblood.util.Catalyst;
 import com.glodblock.github.dmeblood.util.EssenceHelper;
 import mustapelto.deepmoblearning.common.energy.DMLEnergyStorage;
 import mustapelto.deepmoblearning.common.inventory.ItemHandlerBase;
 import mustapelto.deepmoblearning.common.inventory.ItemHandlerDataModel;
+import mustapelto.deepmoblearning.common.tiles.CraftingState;
 import mustapelto.deepmoblearning.common.util.ItemStackHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,6 +32,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
@@ -55,6 +58,7 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
     private BlockPos altarPos = BlockPos.fromLong(0);
     private int numOfSacrificeRunes = 0;
     private double multiplier = 1.0;
+    private CraftingState state = CraftingState.IDLE;
 
     @Override
     public void update() {
@@ -90,7 +94,7 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
                 this.numOfSacrificeRunes = 0;
                 this.progress = 0;
             }
-
+            updateCraftState();
             doStaggeredDiskSave(100);
         } else {
             if (this.highlightingTicks > 0) {
@@ -108,6 +112,26 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
                 }
             }
         }
+    }
+
+    public void updateCraftState() {
+        if (this.state != this.getCurrentState()) {
+            this.state = this.getCurrentState();
+            DeepMobLearningBM.proxy.netHandler.sendToAllTracking(
+                    new SPacketStateUpdate(this, this.state),
+                    new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 10.0)
+            );
+        }
+    }
+
+    protected CraftingState getCurrentState() {
+        if (canContinueCraft()) {
+            return CraftingState.RUNNING;
+        }
+        if (altarIsFull() || !hasDataModel()) {
+            return CraftingState.IDLE;
+        }
+        return CraftingState.ERROR;
     }
 
     public double getSacrificeMultiplier() {
@@ -236,16 +260,16 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
 
     @Override
     public void updateState(boolean markDirty) {
-        IBlockState state = this.world.getBlockState(getPos());
-        this.world.notifyBlockUpdate(getPos(), state, state, 3);
-        if(markDirty) {
-            markDirty();
+        IBlockState state = this.world.getBlockState(this.getPos());
+        this.world.notifyBlockUpdate(this.getPos(), state, state, 3);
+        if (markDirty) {
+            this.markDirty();
         }
     }
 
     @Override
     public SPacketUpdateTileEntity getUpdatePacket() {
-        return new SPacketUpdateTileEntity(getPos(), 3, writeToNBT(new NBTTagCompound()));
+        return new SPacketUpdateTileEntity(this.getPos(), 3, this.writeToNBT(new NBTTagCompound()));
     }
 
     @Nonnull
@@ -271,6 +295,7 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
         compound.setInteger("numOfSacrificeRunes", this.numOfSacrificeRunes);
         compound.setTag("dataModel", this.dataModel.serializeNBT());
         compound.setTag("input", this.input.serializeNBT());
+        compound.setInteger("state", this.state.getIndex());
         this.energyCap.writeToNBT(compound);
         return super.writeToNBT(compound);
     }
@@ -286,6 +311,7 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
         this.altarPos = compound.hasKey("altarPos", Constants.NBT.TAG_LONG) ? BlockPos.fromLong(compound.getLong("altarPos")) : null;
         this.dataModel.deserializeNBT(compound.getCompoundTag("dataModel"));
         this.input.deserializeNBT(compound.getCompoundTag("input"));
+        this.state = CraftingState.byIndex(compound.getInteger("state"));
         this.energyCap.readFromNBT(compound);
         super.readFromNBT(compound);
     }
@@ -320,6 +346,18 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
     @Override
     public IItemHandler getInnerInventory() {
         return new CombinedInvWrapper(this.dataModel, this.input);
+    }
+
+    @Override
+    public CraftingState getState() {
+        return this.state;
+    }
+
+    @Override
+    public void setState(CraftingState state) {
+        this.state = state;
+        IBlockState block = this.world.getBlockState(this.getPos());
+        this.world.notifyBlockUpdate(this.getPos(), block, block, 3);
     }
 
     @Override

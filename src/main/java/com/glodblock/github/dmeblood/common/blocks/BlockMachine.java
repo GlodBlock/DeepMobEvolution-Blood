@@ -3,12 +3,13 @@ package com.glodblock.github.dmeblood.common.blocks;
 import com.glodblock.github.dmeblood.DeepMobLearningBM;
 import com.glodblock.github.dmeblood.ModConstants;
 import com.glodblock.github.dmeblood.common.tile.IContainerProvider;
-import com.glodblock.github.dmeblood.common.tile.TileEntityDigitalAgonizer;
 import com.glodblock.github.dmeblood.proxy.CommonProxy;
+import mustapelto.deepmoblearning.common.tiles.CraftingState;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -21,7 +22,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ChunkCache;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
@@ -32,6 +36,7 @@ import javax.annotation.Nullable;
 public abstract class BlockMachine<T extends IContainerProvider> extends Block implements ITileEntityProvider {
 
     private static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+    private static final PropertyEnum<CraftingState> CRAFTING_STATE = PropertyEnum.create("state", CraftingState.class);
     @SuppressWarnings("FieldCanBeLocal")
     private final String name;
     private final Class<T> tile;
@@ -64,7 +69,9 @@ public abstract class BlockMachine<T extends IContainerProvider> extends Block i
     @Nonnull
     @Override
     public IBlockState getStateForPlacement(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        return getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
+        return getDefaultState()
+                .withProperty(FACING, placer.getHorizontalFacing().getOpposite())
+                .withProperty(CRAFTING_STATE, CraftingState.IDLE);
     }
 
     @SuppressWarnings("deprecation")
@@ -82,7 +89,7 @@ public abstract class BlockMachine<T extends IContainerProvider> extends Block i
     @Nonnull
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, FACING);
+        return new BlockStateContainer(this, FACING, CRAFTING_STATE);
     }
 
     @Override
@@ -120,6 +127,22 @@ public abstract class BlockMachine<T extends IContainerProvider> extends Block i
     @Override
     public TileEntity createNewTileEntity(@Nonnull World world, int i) {
         return (TileEntity) this.getInstance();
+    }
+
+    @SuppressWarnings({"deprecation", "unchecked"})
+    @Nonnull
+    @Override
+    public IBlockState getActualState(@Nonnull IBlockState state, @Nonnull IBlockAccess worldIn, @Nonnull BlockPos pos) {
+        TileEntity te;
+        if (worldIn instanceof ChunkCache) {
+            te = ((ChunkCache) worldIn).getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
+        } else {
+            te = worldIn.getTileEntity(pos);
+        }
+        if (this.tile.isInstance(te)) {
+            return state.withProperty(CRAFTING_STATE, ((T) te).getState());
+        }
+        return state;
     }
 
     public T getInstance() {

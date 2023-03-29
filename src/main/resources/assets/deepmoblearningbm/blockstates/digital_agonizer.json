@@ -14,6 +14,23 @@
       "south": { "y": 180 },
       "west": { "y": 270 },
       "east": { "y": 90 }
+    },
+    "state": {
+      "idle": {
+        "textures": {
+          "2": "deepmoblearningbm:blocks/digital_agonizer_idle"
+        }
+      },
+      "error": {
+        "textures": {
+          "2": "deepmoblearningbm:blocks/digital_agonizer_error"
+        }
+      },
+      "running": {
+        "textures": {
+          "2": "deepmoblearningbm:blocks/digital_agonizer_running"
+        }
+      }
     }
   }
 }
