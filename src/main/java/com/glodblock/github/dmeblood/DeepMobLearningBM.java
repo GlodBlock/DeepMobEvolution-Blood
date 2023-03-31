@@ -2,11 +2,9 @@ package com.glodblock.github.dmeblood;
 
 import com.glodblock.github.dmeblood.common.Registry;
 import com.glodblock.github.dmeblood.common.data.DataSet;
-import com.glodblock.github.dmeblood.common.data.JSONLoader;
 import com.glodblock.github.dmeblood.common.recipes.RecipeLoader;
 import com.glodblock.github.dmeblood.common.tile.IContainerProvider;
 import com.glodblock.github.dmeblood.integration.tconstruct.MaterialDef;
-import com.glodblock.github.dmeblood.network.PacketLoader;
 import com.glodblock.github.dmeblood.proxy.CommonProxy;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -28,7 +26,6 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 import javax.annotation.Nonnull;
-import java.io.File;
 
 @Mod(
         modid = ModConstants.MODID,
@@ -37,8 +34,6 @@ import java.io.File;
 )
 @Mod.EventBusSubscriber
 public class DeepMobLearningBM {
-    private int networkID = 0;
-
     @Mod.Instance(ModConstants.MODID)
     public static DeepMobLearningBM instance;
 
@@ -50,11 +45,7 @@ public class DeepMobLearningBM {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        JSONLoader.setRoot(new File(event.getModConfigurationDirectory(), "dme_bloodmagic"));
-        PacketLoader.init();
-        if (ModConstants.TINKER_CONSTRUCT) {
-            MaterialDef.init();
-        }
+        proxy.preInit(event);
     }
 
     @SubscribeEvent

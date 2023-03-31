@@ -23,12 +23,15 @@ public class MaterialDef {
         BLOOD_INGOT.addTrait(TraitDef.TRAIT_BLOODLUST);
         BLOOD_INGOT.addTrait(TraitDef.TRAIT_GLITCH);
         BLOOD_INGOT.addTrait(TraitDef.TRAIT_OVERFLOW, "head");
-        BLOOD_INGOT.setRenderInfo(new MaterialRenderInfo.MultiColor(0x9b921c, 0xde2412, 0x9b921c));
         TinkerRegistry.addMaterialStats(BLOOD_INGOT, new HeadMaterialStats(450, 19.2F, 6.66F, HarvestLevels.COBALT));
         TinkerRegistry.addMaterialStats(BLOOD_INGOT, new HandleMaterialStats(1.1F, 0));
         TinkerRegistry.addMaterialStats(BLOOD_INGOT, new ExtraMaterialStats(130));
         TinkerRegistry.addMaterialStats(BLOOD_INGOT, new BowMaterialStats(0.66F, 1.2F, 6.66F));
         TinkerRegistry.addMaterial(BLOOD_INGOT);
+    }
+
+    public static void initClient() {
+        BLOOD_INGOT.setRenderInfo(new MaterialRenderInfo.MultiColor(0x9b921c, 0xde2412, 0x9b921c));
     }
 
     private static void setFluid(@Nonnull Material material) {
