@@ -2,6 +2,8 @@ package com.glodblock.github.dmeblood.integration.tconstruct;
 
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import slimeknights.tconstruct.library.TinkerRegistry;
 import slimeknights.tconstruct.library.client.MaterialRenderInfo;
 import slimeknights.tconstruct.library.fluid.FluidMolten;
@@ -30,6 +32,7 @@ public class MaterialDef {
         TinkerRegistry.addMaterial(BLOOD_INGOT);
     }
 
+    @SideOnly(Side.CLIENT)
     public static void initClient() {
         BLOOD_INGOT.setRenderInfo(new MaterialRenderInfo.MultiColor(0x9b921c, 0xde2412, 0x9b921c));
     }

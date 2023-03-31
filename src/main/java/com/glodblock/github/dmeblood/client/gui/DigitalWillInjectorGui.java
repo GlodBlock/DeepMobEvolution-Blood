@@ -24,6 +24,7 @@ public class DigitalWillInjectorGui extends MachineGui<TileEntityDigitalWillInje
     private static final int HEIGHT = 178;
     private AlertInformationZone alertButton;
     private ToolTips progress;
+
     public DigitalWillInjectorGui(TileEntityDigitalWillInjector tile, InventoryPlayer inventory, World world) {
         super(tile, new ContainerDigitalWillInjector(tile, inventory, world));
         this.xSize = WIDTH;
@@ -106,7 +107,7 @@ public class DigitalWillInjectorGui extends MachineGui<TileEntityDigitalWillInje
         drawTexturedModalRect(left + 91, top + 78, 7, 59, 18, 18);
 
         // Draw current energy
-        int energyBarHeight = MathHelper.clamp((int) ((float) energyStorage.getEnergyStored() / (energyStorage.getMaxEnergyStored() - ModConfig.getAgonizerRFCost()) * 49), 0, 49);
+        int energyBarHeight = MathHelper.clamp((int) ((float) energyStorage.getEnergyStored() / (energyStorage.getMaxEnergyStored() - ModConfig.getWillInjectorRFCost()) * 49), 0, 49);
         int energyBarOffset = 49 - energyBarHeight;
         drawTexturedModalRect(left + 52,  top + 17 + energyBarOffset, 0, 59, 7, energyBarHeight);
 

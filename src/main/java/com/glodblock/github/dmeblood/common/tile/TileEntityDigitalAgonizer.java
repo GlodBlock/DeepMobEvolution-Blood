@@ -9,30 +9,21 @@ import com.glodblock.github.dmeblood.ModConfig;
 import com.glodblock.github.dmeblood.client.gui.DigitalAgonizerGui;
 import com.glodblock.github.dmeblood.common.container.ContainerDigitalAgonizer;
 import com.glodblock.github.dmeblood.common.inventory.CatalystInputHandler;
-import com.glodblock.github.dmeblood.network.packets.SPacketStateUpdate;
 import com.glodblock.github.dmeblood.util.Catalyst;
 import com.glodblock.github.dmeblood.util.EssenceHelper;
-import mustapelto.deepmoblearning.common.energy.DMLEnergyStorage;
 import mustapelto.deepmoblearning.common.inventory.ItemHandlerBase;
-import mustapelto.deepmoblearning.common.inventory.ItemHandlerDataModel;
 import mustapelto.deepmoblearning.common.tiles.CraftingState;
-import mustapelto.deepmoblearning.common.util.ItemStackHelper;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
@@ -41,91 +32,88 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, IContainerProvider {
+public class TileEntityDigitalAgonizer extends TileMachine {
 
-    private final ItemHandlerBase dataModel = new ItemHandlerDataModel();
     private final ItemHandlerBase input = new CatalystInputHandler();
-    private final DMLEnergyStorage energyCap = new DMLEnergyStorage(100000, 25600) {
-        protected void onEnergyChanged() {
-            TileEntityDigitalAgonizer.this.markDirty();
-        }
-    };
     private int highlightingTicks = 0;
     private int catalystOperations = 0;
     private int catalystOperationsMax = 0;
-    private int saveTicks = 0;
-    private int progress = 0;
     private BlockPos altarPos = BlockPos.fromLong(0);
     private int numOfSacrificeRunes = 0;
     private double multiplier = 1.0;
-    private CraftingState state = CraftingState.IDLE;
 
     @Override
-    public void update() {
-        if (!this.world.isRemote) {
-            this.saveTicks++;
+    public void onRunningTick() {
+        if (this.isServer()) {
+            if (!hasDataModel() || !isValidDataModelTier()) {
+                this.stop();
+            }
+        }
+    }
 
+    @Override
+    public void onExistingTick() {
+        if (this.isServer()) {
             if (this.highlightingTicks > 0) {
-                this.highlightingTicks--;
+                this.highlightingTicks --;
                 if (this.highlightingTicks == 0) {
-                    updateState(true);
+                    this.updateState(true);
                 }
             }
-
             if (this.catalystOperations == 0) {
-                consumeCatalyst();
+                this.consumeCatalyst();
             }
-
-            if (canContinueCraft()) {
-                if (this.progress == 0) {
-                    updateSacrificeRuneCount();
-                }
-
-                this.progress++;
-                this.energyCap.voidEnergy(ModConfig.getAgonizerRFCost());
-                if (this.progress % 60 == 0) {
-                    fillAltarTank();
-                    this.progress = 0;
-                }
-            } else if (!(hasDataModel() && isValidDataModelTier())) {
-                this.progress = 0;
-            } else if (getAltarTank() == null) {
-                setAltarPos(BlockPos.fromLong(0));
-                this.numOfSacrificeRunes = 0;
-                this.progress = 0;
+            if (this.getAltarTank() == null) {
+                this.setAltarPos(BlockPos.fromLong(0));
             }
-            updateCraftState();
-            doStaggeredDiskSave(100);
         } else {
             if (this.highlightingTicks > 0) {
                 ThreadLocalRandom rand = ThreadLocalRandom.current();
                 if (getAltarTank() != null) {
                     DeepMobLearningBM.proxy.spawnParticle(
-                        this.world,
-                        getAltarPos().getX() + 0.5D + rand.nextDouble(-0.33D, 0.33D),
-                        getAltarPos().getY() + 1.2D,
-                        getAltarPos().getZ() + 0.5D + rand.nextDouble(-0.33D, 0.33D),
-                        rand.nextDouble(-0.02D, 0.02D),
-                        0,
-                        rand.nextDouble(-0.02D, 0.02D)
+                            this.world,
+                            getAltarPos().getX() + 0.5D + rand.nextDouble(-0.33D, 0.33D),
+                            getAltarPos().getY() + 1.2D,
+                            getAltarPos().getZ() + 0.5D + rand.nextDouble(-0.33D, 0.33D),
+                            rand.nextDouble(-0.02D, 0.02D),
+                            0,
+                            rand.nextDouble(-0.02D, 0.02D)
                     );
                 }
             }
         }
     }
 
-    public void updateCraftState() {
-        if (this.state != this.getCurrentState()) {
-            this.state = this.getCurrentState();
-            DeepMobLearningBM.proxy.netHandler.sendToAllTracking(
-                    new SPacketStateUpdate(this, this.state),
-                    new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 10.0)
-            );
+    @Override
+    public void processOutput() {
+        if (this.isServer()) {
+            BloodAltar altar = getAltarTank();
+            if (altar != null) {
+                altar.fillMainTank(getFillAmount());
+            }
+            if (this.catalystOperations > 0) {
+                this.catalystOperations--;
+            } else {
+                this.multiplier = 1.0;
+            }
         }
     }
 
+    @Override
+    public boolean beginProcess() {
+        if (this.isServer()) {
+            if (!altarIsFull() && hasDataModel() && isValidDataModelTier()) {
+                this.maxProgress = 60;
+                this.FEt = ModConfig.getAgonizerRFCost();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     protected CraftingState getCurrentState() {
-        if (canContinueCraft()) {
+        if (this.maxProgress > 0 && this.energyCap.getEnergyStored() >= this.FEt) {
             return CraftingState.RUNNING;
         }
         if (altarIsFull() || !hasDataModel()) {
@@ -152,19 +140,6 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
         }
     }
 
-    private void fillAltarTank() {
-        BloodAltar altar = getAltarTank();
-        if (altar != null) {
-            altar.fillMainTank(getFillAmount());
-        }
-
-        if (this.catalystOperations > 0) {
-            this.catalystOperations--;
-        } else {
-            this.multiplier = 1.0;
-        }
-    }
-
     private void consumeCatalyst() {
         Catalyst catalyst = Catalyst.getCatalyst(getCatalystStack());
         if (catalyst != null) {
@@ -173,13 +148,6 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
             this.multiplier = catalyst.getMultiplier();
             getCatalystStack().shrink(1);
         }
-    }
-
-    private boolean canContinueCraft() {
-        return this.energyCap.getEnergyStored() > ModConfig.getAgonizerRFCost() &&
-                !altarIsFull() &&
-                hasDataModel() &&
-                isValidDataModelTier();
     }
 
     public BlockPos getAltarPos() {
@@ -219,14 +187,6 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
         return this.input.getStackInSlot(0);
     }
 
-    private ItemStack getDataModelStack() {
-        return this.dataModel.getStackInSlot(0);
-    }
-
-    public boolean hasDataModel() {
-        return ItemStackHelper.isDataModel(getDataModelStack());
-    }
-
     public boolean isValidDataModelTier() {
         return EssenceHelper.getFluidBaseAmount(getDataModelStack()) > 0;
     }
@@ -247,78 +207,30 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
         return this.multiplier;
     }
 
-    public int getProgress() {
-        return this.progress;
-    }
-
-    private void doStaggeredDiskSave(int divisor) {
-        if (this.saveTicks % divisor == 0) {
-            this.markDirty();
-            this.saveTicks = 0;
-        }
-    }
-
-    @Override
-    public void updateState(boolean markDirty) {
-        IBlockState state = this.world.getBlockState(this.getPos());
-        this.world.notifyBlockUpdate(this.getPos(), state, state, 3);
-        if (markDirty) {
-            this.markDirty();
-        }
-    }
-
-    @Override
-    public SPacketUpdateTileEntity getUpdatePacket() {
-        return new SPacketUpdateTileEntity(this.getPos(), 3, this.writeToNBT(new NBTTagCompound()));
-    }
-
     @Nonnull
     @Override
-    public NBTTagCompound getUpdateTag() {
-        return this.writeToNBT(new NBTTagCompound());
-    }
-
-    @Override
-    public void onDataPacket(@Nonnull NetworkManager net, SPacketUpdateTileEntity packet) {
-        this.readFromNBT(packet.getNbtCompound());
-    }
-
-    @Nonnull
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound writeToNBT(@Nonnull NBTTagCompound compound) {
+        super.writeToNBT(compound);
         compound.setInteger("highlightingTicks", this.highlightingTicks);
         compound.setInteger("catalystOperations", this.catalystOperations);
         compound.setInteger("catalystOperationsMax", this.catalystOperationsMax);
-        compound.setInteger("progress", this.progress);
         compound.setDouble("mutliplier", this.multiplier);
         compound.setLong("altarPos", this.altarPos.toLong());
         compound.setInteger("numOfSacrificeRunes", this.numOfSacrificeRunes);
-        compound.setTag("dataModel", this.dataModel.serializeNBT());
         compound.setTag("input", this.input.serializeNBT());
-        compound.setInteger("state", this.state.getIndex());
-        this.energyCap.writeToNBT(compound);
         return super.writeToNBT(compound);
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
+    public void readFromNBT(@Nonnull NBTTagCompound compound) {
+        super.readFromNBT(compound);
         this.highlightingTicks = compound.hasKey("highlightingTicks", Constants.NBT.TAG_INT) ? compound.getInteger("highlightingTicks") : 0;
         this.catalystOperations = compound.hasKey("catalystOperations", Constants.NBT.TAG_INT) ? compound.getInteger("catalystOperations") : 0;
         this.catalystOperationsMax = compound.hasKey("catalystOperationsMax", Constants.NBT.TAG_INT) ? compound.getInteger("catalystOperationsMax") : 0;
-        this.progress = compound.hasKey("progress", Constants.NBT.TAG_INT) ? compound.getInteger("progress") : 0;
         this.multiplier = compound.hasKey("mutliplier", Constants.NBT.TAG_DOUBLE) ? compound.getDouble("mutliplier") : 1.0;
         this.numOfSacrificeRunes = compound.hasKey("numOfSacrificeRunes", Constants.NBT.TAG_INT) ? compound.getInteger("numOfSacrificeRunes") : 0;
         this.altarPos = compound.hasKey("altarPos", Constants.NBT.TAG_LONG) ? BlockPos.fromLong(compound.getLong("altarPos")) : null;
-        this.dataModel.deserializeNBT(compound.getCompoundTag("dataModel"));
         this.input.deserializeNBT(compound.getCompoundTag("input"));
-        this.state = CraftingState.byIndex(compound.getInteger("state"));
-        this.energyCap.readFromNBT(compound);
-        super.readFromNBT(compound);
-    }
-
-    @Override
-    public boolean shouldRefresh(@Nonnull World world, @Nonnull BlockPos pos, IBlockState oldState, IBlockState newState) {
-        return oldState.getBlock() != newState.getBlock();
     }
 
     @Override
@@ -349,18 +261,6 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
     }
 
     @Override
-    public CraftingState getState() {
-        return this.state;
-    }
-
-    @Override
-    public void setState(CraftingState state) {
-        this.state = state;
-        IBlockState block = this.world.getBlockState(this.getPos());
-        this.world.notifyBlockUpdate(this.getPos(), block, block, 3);
-    }
-
-    @Override
     public ContainerDigitalAgonizer getContainer(TileEntity entity, EntityPlayer player, World world, int x, int y, int z) {
         return new ContainerDigitalAgonizer((TileEntityDigitalAgonizer) world.getTileEntity(new BlockPos(x, y, z)), player.inventory, world);
     }
@@ -369,6 +269,5 @@ public class TileEntityDigitalAgonizer extends TileEntity implements ITickable, 
     public DigitalAgonizerGui getGui(TileEntity entity, EntityPlayer player, World world, int x, int y, int z) {
         return new DigitalAgonizerGui((TileEntityDigitalAgonizer) world.getTileEntity(new BlockPos(x, y, z)), player.inventory, world);
     }
-
 
 }

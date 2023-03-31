@@ -1,35 +1,24 @@
 package com.glodblock.github.dmeblood.common.tile;
 
 import WayofTime.bloodmagic.soul.EnumDemonWillType;
-import com.glodblock.github.dmeblood.DeepMobLearningBM;
 import com.glodblock.github.dmeblood.ModConfig;
 import com.glodblock.github.dmeblood.client.gui.DigitalWillInjectorGui;
 import com.glodblock.github.dmeblood.common.container.ContainerDigitalWillInjector;
 import com.glodblock.github.dmeblood.common.data.DataSet;
 import com.glodblock.github.dmeblood.common.inventory.SentientInputHandler;
 import com.glodblock.github.dmeblood.common.inventory.SoulGemInputHandler;
-import com.glodblock.github.dmeblood.network.packets.SPacketStateUpdate;
 import com.glodblock.github.dmeblood.util.EssenceHelper;
 import com.glodblock.github.dmeblood.util.SentientWeapon;
-import mustapelto.deepmoblearning.common.energy.DMLEnergyStorage;
-import mustapelto.deepmoblearning.common.inventory.ItemHandlerBase;
-import mustapelto.deepmoblearning.common.inventory.ItemHandlerDataModel;
 import mustapelto.deepmoblearning.common.tiles.CraftingState;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
@@ -37,19 +26,10 @@ import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TileEntityDigitalWillInjector extends TileEntity implements ITickable, IContainerProvider {
+public class TileEntityDigitalWillInjector extends TileMachine {
 
-    private final ItemHandlerBase dataModel = new ItemHandlerDataModel();
     private final SentientInputHandler weapon = new SentientInputHandler();
     private final SoulGemInputHandler gem = new SoulGemInputHandler();
-    private final DMLEnergyStorage energyCap = new DMLEnergyStorage(100000, 25600) {
-        protected void onEnergyChanged() {
-            TileEntityDigitalWillInjector.this.markDirty();
-        }
-    };
-    private int saveTicks = 0;
-    private int progress = 0;
-    private CraftingState state = CraftingState.IDLE;
 
     @Override
     public int getID() {
@@ -62,15 +42,52 @@ public class TileEntityDigitalWillInjector extends TileEntity implements ITickab
     }
 
     @Override
-    public CraftingState getState() {
-        return this.state;
+    public void onRunningTick() {
+        if (this.isServer()) {
+            if (!((this.weapon.getWillType() == this.gem.getWillType() && this.gem.canFill(this.getFinalOutput(),this.gem.getWillType()) ||
+                    this.gem.getWillType() == null && this.gem.isEmpty())) ||
+                    this.weapon.getWillType() == null ||
+                    this.getModelModifier() <= 0 ||
+                    this.getTierOutput() <= 0) {
+                this.stop();
+            }
+        }
     }
 
     @Override
-    public void setState(CraftingState state) {
-        this.state = state;
-        IBlockState block = this.world.getBlockState(this.getPos());
-        this.world.notifyBlockUpdate(this.getPos(), block, block, 3);
+    public void onExistingTick() {
+        // NO-OP
+    }
+
+    @Override
+    public void processOutput() {
+        if (this.isServer()) {
+            if (this.weapon.getWillType() != null) {
+                if (this.weapon.getWillType() == this.gem.getWillType() && this.gem.canFill(this.getFinalOutput(), this.gem.getWillType())) {
+                    this.gem.fillGem(this.getFinalOutput(), this.weapon.getWillType());
+                    SentientWeapon.damageWeapon(this.weapon.getStackInSlot(0), this.world.rand);
+                } else if (this.gem.getWillType() == null && this.gem.isEmpty()) {
+                    this.gem.genSoul(this.getFinalOutput(), this.weapon.getWillType());
+                    SentientWeapon.damageWeapon(this.weapon.getStackInSlot(0), this.world.rand);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean beginProcess() {
+        if (this.isServer()) {
+            if (this.weapon.getWillType() != null &&
+                (this.weapon.getWillType() == this.gem.getWillType() && this.gem.canFill(this.getFinalOutput(),this.gem.getWillType()) ||
+                 this.gem.getWillType() == null && this.gem.isEmpty()) &&
+                this.getModelModifier() > 0 &&
+                this.getTierOutput() > 0) {
+                this.maxProgress = 60;
+                this.FEt = ModConfig.getWillInjectorRFCost();
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -84,36 +101,8 @@ public class TileEntityDigitalWillInjector extends TileEntity implements ITickab
     }
 
     @Override
-    public void update() {
-        if (!this.world.isRemote) {
-            this.saveTicks++;
-            if (canContinueCraft()) {
-                this.progress++;
-                this.energyCap.voidEnergy(ModConfig.getWillInjectorRFCost());
-                if (this.progress % 60 == 0) {
-                    this.output();
-                    this.progress = 0;
-                }
-            } else {
-                this.progress = 0;
-            }
-            updateCraftState();
-            doStaggeredDiskSave(100);
-        }
-    }
-
-    public void updateCraftState() {
-        if (this.state != this.getCurrentState()) {
-            this.state = this.getCurrentState();
-            DeepMobLearningBM.proxy.netHandler.sendToAllTracking(
-                    new SPacketStateUpdate(this, this.state),
-                    new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 10.0)
-            );
-        }
-    }
-
     protected CraftingState getCurrentState() {
-        if (canContinueCraft()) {
+        if (this.maxProgress > 0 && this.energyCap.getEnergyStored() >= this.FEt) {
             return CraftingState.RUNNING;
         }
         if (getDataModelStack().isEmpty()) {
@@ -122,31 +111,10 @@ public class TileEntityDigitalWillInjector extends TileEntity implements ITickab
         return CraftingState.ERROR;
     }
 
-    private void output() {
-        if (this.weapon.getWillType() != null) {
-            if (this.weapon.getWillType() == this.gem.getWillType() && this.gem.canFill(this.getFinalOutput(), this.gem.getWillType())) {
-                this.gem.fillGem(this.getFinalOutput(), this.weapon.getWillType());
-                SentientWeapon.damageWeapon(this.weapon.getStackInSlot(0), this.world.rand);
-            } else if (this.gem.getWillType() == null && this.gem.isEmpty()) {
-                this.gem.genSoul(this.getFinalOutput(), this.weapon.getWillType());
-                SentientWeapon.damageWeapon(this.weapon.getStackInSlot(0), this.world.rand);
-            }
-        }
-    }
-
     private double getFinalOutput() {
         double base = SentientWeapon.getWill(this.weapon.getStackInSlot(0), this.getDataModelStack(), this.world.rand);
         double tier = this.getTierOutput();
         return base * tier;
-    }
-
-    private boolean canContinueCraft() {
-        return this.weapon.getWillType() != null &&
-                (this.weapon.getWillType() == this.gem.getWillType() && this.gem.canFill(this.getFinalOutput(),this.gem.getWillType()) ||
-                this.gem.getWillType() == null && this.gem.isEmpty()) &&
-                this.energyCap.getEnergyStored() > ModConfig.getWillInjectorRFCost() &&
-                this.getModelModifier() > 0 &&
-                this.getTierOutput() > 0;
     }
 
     public ItemStack getDataModelStack() {
@@ -161,62 +129,20 @@ public class TileEntityDigitalWillInjector extends TileEntity implements ITickab
         return DataSet.willTierData.getWillOutput(EssenceHelper.getModelTier(this.getDataModelStack()));
     }
 
-    private void doStaggeredDiskSave(int divisor) {
-        if (this.saveTicks % divisor == 0) {
-            this.markDirty();
-            this.saveTicks = 0;
-        }
-    }
-
-    @Override
-    public void updateState(boolean markDirty) {
-        IBlockState state = this.world.getBlockState(getPos());
-        this.world.notifyBlockUpdate(getPos(), state, state, 3);
-        if(markDirty) {
-            markDirty();
-        }
-    }
-
-    @Override
-    public SPacketUpdateTileEntity getUpdatePacket() {
-        return new SPacketUpdateTileEntity(getPos(), 3, this.writeToNBT(new NBTTagCompound()));
-    }
-
     @Nonnull
     @Override
-    public NBTTagCompound getUpdateTag() {
-        return this.writeToNBT(new NBTTagCompound());
-    }
-
-    @Override
-    public void onDataPacket(@Nonnull NetworkManager net, SPacketUpdateTileEntity packet) {
-        this.readFromNBT(packet.getNbtCompound());
-    }
-
-    @Nonnull
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        compound.setInteger("progress", this.progress);
-        compound.setTag("dataModel", this.dataModel.serializeNBT());
+    public NBTTagCompound writeToNBT(@Nonnull NBTTagCompound compound) {
+        super.writeToNBT(compound);
         compound.setTag("weapon", this.weapon.serializeNBT());
         compound.setTag("gem", this.gem.serializeNBT());
-        this.energyCap.writeToNBT(compound);
-        return super.writeToNBT(compound);
+        return compound;
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
-        this.progress = compound.hasKey("progress", Constants.NBT.TAG_INT) ? compound.getInteger("progress") : 0;
-        this.dataModel.deserializeNBT(compound.getCompoundTag("dataModel"));
+    public void readFromNBT(@Nonnull NBTTagCompound compound) {
+        super.readFromNBT(compound);
         this.weapon.deserializeNBT(compound.getCompoundTag("weapon"));
         this.gem.deserializeNBT(compound.getCompoundTag("gem"));
-        this.energyCap.readFromNBT(compound);
-        super.readFromNBT(compound);
-    }
-
-    @Override
-    public boolean shouldRefresh(@Nonnull World world, @Nonnull BlockPos pos, IBlockState oldState, IBlockState newState) {
-        return oldState.getBlock() != newState.getBlock();
     }
 
     @Override
@@ -242,10 +168,6 @@ public class TileEntityDigitalWillInjector extends TileEntity implements ITickab
 
     public EnumDemonWillType getGemWillType() {
         return this.gem.getWillType();
-    }
-
-    public int getProgress() {
-        return this.progress;
     }
 
 }
