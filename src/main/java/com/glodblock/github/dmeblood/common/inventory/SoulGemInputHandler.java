@@ -69,6 +69,7 @@ public class SoulGemInputHandler extends ItemHandlerBase {
         }
         return ItemStack.EMPTY;
     }
+
     public boolean isEmpty() {
         return this.getStackInSlot(slotIndex).isEmpty();
     }

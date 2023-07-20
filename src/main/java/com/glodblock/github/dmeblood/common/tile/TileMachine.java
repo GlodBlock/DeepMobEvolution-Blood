@@ -1,6 +1,7 @@
 package com.glodblock.github.dmeblood.common.tile;
 
 import com.glodblock.github.dmeblood.DeepMobLearningBM;
+import com.glodblock.github.dmeblood.ModConfig;
 import com.glodblock.github.dmeblood.network.packets.SPacketStateUpdate;
 import mustapelto.deepmoblearning.common.energy.DMLEnergyStorage;
 import mustapelto.deepmoblearning.common.inventory.ItemHandlerBase;
@@ -25,7 +26,7 @@ public abstract class TileMachine extends TileEntity implements ITickable, ICont
 
     private static final int DISK_SAVE = 100;
     protected final ItemHandlerBase dataModel = new ItemHandlerDataModel();
-    protected final DMLEnergyStorage energyCap = new DMLEnergyStorage(100000, 25600) {
+    protected final DMLEnergyStorage energyCap = new DMLEnergyStorage(ModConfig.getRFCapacity(), ModConfig.getRFInput()) {
         protected void onEnergyChanged() {
             TileMachine.this.markDirty();
         }

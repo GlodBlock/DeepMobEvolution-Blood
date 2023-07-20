@@ -14,15 +14,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ToolTips extends GuiLabel {
     private static final AtomicInteger id = new AtomicInteger();
     private final List<String> tooltip = new ArrayList<>();
-    private boolean hovered;
     private final int color;
 
-    public ToolTips(FontRenderer render, int id, int x, int y, int width, int height,int color) {
-        super(render, id, x, y, width, height,color);
+    public ToolTips(FontRenderer render, int id, int x, int y, int width, int height, int color) {
+        super(render, id, x, y, width, height, color);
         this.color = color;
     }
+
     public ToolTips(FontRenderer render, int x, int y, int width, int height) {
-        this(render,id.getAndIncrement(),x,y,width,height,0xFFFFFFF);
+        this(render, id.getAndIncrement(), x, y, width, height, 0xFFFFFFF);
     }
 
     public void setTooltip(List<String> tooltip) {
@@ -41,9 +41,9 @@ public class ToolTips extends GuiLabel {
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+        boolean hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
         GuiScreen gui = mc.currentScreen;
-        if (this.hovered && gui != null) {
+        if (hovered && gui != null) {
             GuiUtils.drawHoveringText(this.tooltip, mouseX, mouseY > 8 ? mouseY - 8 : 3, gui.width, gui.height, -1, mc.fontRenderer);
         }
     }
