@@ -53,6 +53,8 @@ dependencies {
     deobfCompile 'curse.maven:guide-api-228832:2645992' //gpi
     deobfCompile 'curse.maven:tinkers-construct-74072:2902483' //tic
     deobfCompile 'curse.maven:mantle-74924:2713386' //mtl
+    deobfCompile 'curse.maven:tinkers-evolution-384589:3362723' //tice
+    deobfCompile 'curse.maven:libnine-322344:3509087' //lib9
 }
 
 minecraft {
