@@ -28,7 +28,7 @@ public class SentientInputHandler extends ItemHandlerBase {
     @Nullable
     public EnumDemonWillType getWillType() {
         ItemStack stack = this.getStackInSlot(0);
-        if (stack.isEmpty()) {
+        if (stack.isEmpty() || !SentientWeapon.isValidWeapon(stack)) {
             return null;
         }
         if (stack.getItem() instanceof IMultiWillTool) {
